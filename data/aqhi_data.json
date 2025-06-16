@@ -1,0 +1,18 @@
+{
+  "MOD-00624": {
+    "name": "Location 25",
+    "lat": 49.141425,
+    "lng": -123.10825,
+    "latest": {
+      "AQHI": 4
+    }
+  },
+  "MOD-00623": {
+    "name": "Location 20",
+    "lat": 49.16117,
+    "lng": -122.96617,
+    "latest": {
+      "AQHI": 6
+    }
+  }
+}

@@ -1,0 +1,12 @@
+# netlify.toml
+[build]
+  # No build command for plain HTML/JS/CSS
+  command   = ""
+  # Publish the root folder (where your index.html lives)
+  publish   = "."
+
+# For single-page apps / client-side routing (optional)
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200

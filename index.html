@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Community AQHI Dashboard</title>
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Fallback styles if css/style.css is still minimal -->
+  <style>
+    body { margin:0; font-family:system-ui,sans-serif; display:flex; flex-direction:column; min-height:100vh; }
+    header { background:#004b8d; color:#fff; padding:2.5rem 1rem 3rem; text-align:center; }
+    header h1 { margin:0 0 .5rem; font-size:2rem; }
+    .tagline { font-weight:300; margin:0; }
+
+    nav { margin-top:1rem; }
+    .nav-button {
+      color:#fff;
+      text-decoration:none;
+      margin:0 .5rem;
+      font-weight:500;
+      padding:0.5rem 1rem;
+      background:rgba(255,255,255,0.2);
+      border-radius:6px;
+      transition:background 0.2s, transform 0.2s;
+      display:inline-block;
+    }
+    .nav-button:hover {
+      background:rgba(255,255,255,0.4);
+      transform:translateY(-2px);
+    }
+
+    .cards { display:grid; gap:1rem; padding:2rem 1rem; flex:1; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .card  { text-decoration:none; color:#004b8d; background:#e6f1ff; padding:2rem 1rem; border-radius:10px; font-size:1.25rem; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:.18s transform; }
+    .card:hover { transform:translateY(-3px); }
+
+    footer { text-align:center; padding:1rem 0 1.5rem; font-size:.9rem; color:#666; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Community Clean Air Spaces Study</h1>
+    <p class="tagline">Live data from low-cost sensors across Vancouver Coastal Health</p>
+    <nav>
+      <a class="nav-button" href="index.html">Home</a>
+      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="details.html">Detailed View</a>
+      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="info.html">Info</a>
+    </nav>
+  </header>
+  
+  <section class="cards">
+    <a class="card" href="map.html">Interactive&nbsp;Map</a>
+    <a class="card" href="details.html">Detailed&nbsp;View</a>
+    <a class="card" href="list.html" target="_blank">Sensor&nbsp;List</a>
+  </section>
+
+  <footer id="stamp">Updating&hellip;</footer>
+
+  <!-- load the JSON once to show last-generated time -->
+  <script type="module">
+    import { getSensorData } from './js/data.js';
+    getSensorData()
+      .then(({ generated_at }) => {
+        document.getElementById('stamp').textContent =
+          'Last Updated ' + new Date(generated_at).toLocaleString();
+      })
+      .catch(() => {
+        document.getElementById('stamp').textContent =
+          '⚠ Unable to fetch latest data';
+      });
+  </script>
+</body>
+</html>

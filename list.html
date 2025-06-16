@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sensor List</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Basic fallback styles if style.css is empty -->
+  <style>
+    body { margin:0; font-family:system-ui,sans-serif; }
+    header { padding:.6rem 1rem; background:#004b8d; color:#fff; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    header h2 { margin:0; font-size:1.2rem; }
+    nav a { color:#fff; text-decoration:none; margin-right:.6rem; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:.45rem .7rem; border-bottom:1px solid #ddd; text-align:left; }
+    th { cursor:pointer; user-select:none; }
+    tbody tr:hover { background:#f5faff; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>Sensor List</h2>
+    <nav>
+      <a class="nav-button" href="index.html">Home</a>
+      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="details.html">Detailed View</a>
+      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="info.html">Info</a>
+    </nav>
+  </header>
+
+  <main>
+    <table id="sensor-table">
+      <thead>
+        <tr>
+          <th data-key="id">ID ▲</th>
+          <th data-key="name">Name</th>
+          <th data-key="aqhi">AQHI</th>
+          <th data-key="primary">Primary</th>
+          <th data-key="timestamp">Last Update</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <script type="module" src="js/list.js"></script>
+</body>
+</html>

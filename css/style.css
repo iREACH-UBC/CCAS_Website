@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+header {
+  padding: 1em;
+  background: #f0f0f0;
+}
+
+.nav-button {
+  margin-right: 10px;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+}
+
+#map {
+  height: 60vh;
+  width: 100%;
+}
+
+#sensor-details {
+  padding: 1em;
+}

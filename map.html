@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Air Quality Map</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- Your main stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Fallback style in case style.css is still empty -->
+  <style>
+    body        { margin:0; font-family:system-ui,sans-serif; }
+    header      { padding:.6rem 1rem; background:#004b8d; color:#fff; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    header h1   { margin:0; font-size:1.2rem; }
+    nav         { display:flex; gap:.6rem; flex-wrap:wrap; }
+    .nav-button { color:#fff; text-decoration:none; padding:.2rem .6rem; border-radius:4px; }
+    .nav-button:hover { background:rgba(255,255,255,.15); }
+
+    /* Map container fills rest of viewport under header */
+    main        { height:calc(100vh - 56px); }            /* 56px = header approx */
+    #map        { width:100%; height:100%; }
+    #sensor-details { display:none; } /* kept for future use */
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Air Quality Dashboard</h1>
+    <nav>
+      <a class="nav-button" href="index.html">Home</a>
+      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="details.html">Detailed View</a>
+      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="info.html">Info</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="map"></div>
+    <div id="sensor-details"></div>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Map logic (ES-module) -->
+  <script type="module" src="js/map.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Quality Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    header, nav, main { padding: 1em; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .nav-button { margin-right: 10px; padding: 0.5em 1em; cursor: pointer; }
+    #map { height: 60vh; width: 100%; }
+    #sensor-details { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Air Quality Dashboard</h1>
+    <nav>
+      <a class="nav-button" href="index.html">Home</a>
+      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="details.html">Detailed View</a>
+      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="info.html">Info</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="tab active">
+      <p>This dashboard displays real-time air quality data.</p>
+      <div id="advisories" style="background-color:#f8d7da;padding:10px;border-radius:5px;">
+        <strong>Active Air Quality Advisories:</strong>
+        <p>No advisories are currently active.</p>
+      </div>
+    </section>
+
+    <section id="map" class="tab">
+      <div id="map"></div>
+      <div id="sensor-details"></div>
+    </section>
+
+    <section id="details" class="tab">
+      <h2>Detailed View</h2>
+      <canvas id="pollutant-chart" width="400" height="200"></canvas>
+    </section>
+
+    <section id="info" class="tab">
+      <h2>Info</h2>
+      <p>This page will contain additional information soon.</p>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const sensorLocations = {
+      "MOD-00624": { name: "Location 25", lat: 49.141425, lng: -123.10825, AQHI: 3 },
+      "MOD-00623": { name: "Location 20", lat: 49.161175, lng: -122.966170, AQHI: 5 }
+    };
+
+    function getAQHIColor(aqhi) {
+      if (aqhi <= 1) return "#67c1f1";
+      if (aqhi <= 2) return "#4e95c7";
+      if (aqhi <= 3) return "#396798";
+      if (aqhi <= 4) return "#e7eb38";
+      if (aqhi <= 5) return "#f1cb2e";
+      if (aqhi <= 6) return "#e79647";
+      if (aqhi <= 7) return "#dd6869";
+      if (aqhi <= 8) return "#d82732";
+      if (aqhi <= 9) return "#bf2733";
+      if (aqhi <= 10) return "#8b2328";
+      return "#5a161b";
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+    }
+
+    const map = L.map("map").setView([49.141425, -123.10825], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    for (const [id, loc] of Object.entries(sensorLocations)) {
+      const color = getAQHIColor(loc.AQHI);
+      const marker = L.circleMarker([loc.lat, loc.lng], {
+        color: color,
+        radius: 8,
+        fillOpacity: 0.8
+      }).addTo(map);
+      marker.bindPopup(`<b>${loc.name}</b><br>AQHI: ${loc.AQHI}`);
+    }
+  </script>
+</body>
+</html>
