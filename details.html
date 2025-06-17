@@ -39,11 +39,24 @@
     canvas { max-width:100%; }
   </style>
 
-  <!-- Chart.js core (only!) -->
+  <!-- Chart.js core -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <!-- Time-scale adapter for Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+  
   <!-- Your modules -->
   <script type="module" src="js/data.js"></script>
   <script type="module" src="js/details.js"></script>
+  …
+  <select id="pollutant-select">
+    <option value="PM2.5">PM₂.₅</option>
+    <!-- PM10 removed -->
+    <option value="O3">O₃</option>
+    <option value="NO2">NO₂</option>
+    <option value="NO">NO</option>
+    <option value="CO">CO</option>
+    <option value="CO2">CO₂</option>
+  </select>
 </head>
 <body>
   <header>
