@@ -90,6 +90,11 @@ async function drawChart () {
       `<p style="padding:1rem;color:#c00">No data for ${pollutantSel.value} at ${sensor.name || sensor.id}</p>`;
     return;
   }
+  
+// Update footer with last-seen timestamp for this sensor
+document.getElementById('stamp').textContent =
+  'Last seen ' + new Date(sensor.history.at(-1)[0]).toLocaleString();
+
 
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
