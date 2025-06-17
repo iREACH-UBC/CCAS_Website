@@ -10,19 +10,44 @@
   <!-- Basic fallback styles if style.css is empty -->
   <style>
     body { margin:0; font-family:system-ui,sans-serif; }
-    header { padding:.6rem 1rem; background:#004b8d; color:#fff; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
-    header h2 { margin:0; font-size:1.2rem; }
-    nav a { color:#fff; text-decoration:none; margin-right:.6rem; }
+    header {
+      padding:.6rem 1rem;
+      background:#004b8d;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      gap:1rem;
+      flex-wrap:wrap;
+    }
+    header h1 {
+      margin:0;
+      font-size:1.2rem;
+    }
+    nav {
+      display:flex;
+      gap:.6rem;
+      flex-wrap:wrap;
+    }
+    .nav-button {
+      color:#fff;
+      text-decoration:none;
+      padding:.2rem .6rem;
+      border-radius:4px;
+    }
+    .nav-button:hover {
+      background:rgba(255,255,255,.15);
+    }
     table { width:100%; border-collapse:collapse; }
     th, td { padding:.45rem .7rem; border-bottom:1px solid #ddd; text-align:left; }
     th { cursor:pointer; user-select:none; }
     tbody tr:hover { background:#f5faff; }
+    main { padding:1rem; max-width:900px; margin:auto; }
   </style>
 </head>
 
 <body>
   <header>
-    <h2>Sensor List</h2>
+    <h1>Air Quality Dashboard</h1>
     <nav>
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
@@ -48,5 +73,20 @@
   </main>
 
   <script type="module" src="js/list.js"></script>
+  <footer id="stamp">Updating&hellip;</footer>
+
+  <!-- load the JSON once to show last-generated time -->
+  <script type="module">
+    import { getSensorData } from './js/data.js';
+    getSensorData()
+      .then(({ generated_at }) => {
+        document.getElementById('stamp').textContent =
+          'Last Updated ' + new Date(generated_at).toLocaleString();
+      })
+      .catch(() => {
+        document.getElementById('stamp').textContent =
+          '⚠ Unable to fetch latest data';
+      });
+  </script>
 </body>
 </html>

@@ -2,8 +2,13 @@
 
 import { getSensorData } from './data.js';
 
-/* ── 1.  Leaflet map ──────────────────────────────────────────────── */
-const map = L.map('map').setView([49.141425, -123.10825], 12);
+const map = L.map('map')
+  .addLayer(L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'))
+
+// approximate VCH bounds: SW corner at ~49.0° N, –123.6° W; NE at ~50.5° N, –122.0° W
+const vchBounds = [[49.0, -123.6], [50.5, -122.0]]
+map.fitBounds(vchBounds)
+
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
