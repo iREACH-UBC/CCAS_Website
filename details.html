@@ -4,60 +4,37 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Air Quality Dashboard – Detailed View</title>
+
   <link rel="stylesheet" href="css/style.css" />
+
   <style>
     body { margin:0; font-family:system-ui,sans-serif; }
     header {
       padding:.6rem 1rem;
       background:#004b8d;
       color:#fff;
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      flex-wrap:wrap;
+      display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
     }
-    header h1 {
-      margin:0;
-      font-size:1.2rem;
-    }
-    nav {
-      display:flex;
-      gap:.6rem;
-      flex-wrap:wrap;
-    }
-    .nav-button {
-      color:#fff;
-      text-decoration:none;
-      padding:.2rem .6rem;
-      border-radius:4px;
-    }
-    .nav-button:hover {
-      background:rgba(255,255,255,.15);
-    }
-    main { padding:1rem; max-width:900px; margin:auto; }
-    section { margin-bottom:1rem; }
-    canvas { max-width:100%; }
+    header h1{ margin:0; font-size:1.2rem; }
+    nav{ display:flex; gap:.6rem; flex-wrap:wrap; }
+    .nav-button{ color:#fff; text-decoration:none; padding:.2rem .6rem; border-radius:4px; }
+    .nav-button:hover{ background:rgba(255,255,255,.15); }
+    main{ padding:1rem; max-width:900px; margin:auto; }
+    section{ margin-bottom:1rem; }
+    canvas{ max-width:100%; }
+    /* New: keep both selects on one neat line */
+    .selectors{ display:flex; flex-wrap:wrap; gap:.8rem; align-items:center; }
   </style>
 
-  <!-- Chart.js core -->
+  <!-- Chart.js core + time adapter -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
-  <!-- Time-scale adapter for Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
-  
+
   <!-- Your modules -->
   <script type="module" src="js/data.js"></script>
   <script type="module" src="js/details.js"></script>
-  …
-  <select id="pollutant-select">
-    <option value="PM2.5">PM₂.₅</option>
-    <!-- PM10 removed -->
-    <option value="O3">O₃</option>
-    <option value="NO2">NO₂</option>
-    <option value="NO">NO</option>
-    <option value="CO">CO</option>
-    <option value="CO2">CO₂</option>
-  </select>
 </head>
+
 <body>
   <header>
     <h1>Air Quality Dashboard</h1>
@@ -71,15 +48,14 @@
   </header>
 
   <main>
-    <section>
+    <!-- combined selector row -->
+    <section class="selectors">
       <label for="sensor-select">Sensor:</label>
       <select id="sensor-select"></select>
-    </section>
-    <section>
+
       <label for="pollutant-select">Pollutant:</label>
       <select id="pollutant-select">
         <option value="PM2.5">PM₂.₅</option>
-        <option value="PM10">PM₁₀</option>
         <option value="O3">O₃</option>
         <option value="NO2">NO₂</option>
         <option value="NO">NO</option>
@@ -87,13 +63,15 @@
         <option value="CO2">CO₂</option>
       </select>
     </section>
+
     <section>
       <canvas id="pollutant-chart" height="220"></canvas>
     </section>
   </main>
+
   <footer id="stamp">Updating&hellip;</footer>
 
-  <!-- load the JSON once to show last-generated time -->
+  <!-- Show last-generated timestamp -->
   <script type="module">
     import { getSensorData } from './js/data.js';
     getSensorData()
