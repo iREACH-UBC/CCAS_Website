@@ -59,20 +59,6 @@
     <a class="card" href="info.html">Info&nbsp;and&nbsp;Resources</a>
   </section>
 
-  <footer id="stamp">Updating&hellip;</footer>
-
-  <!-- load the JSON once to show last-generated time -->
-  <script type="module">
-    import { getSensorData } from './js/data.js';
-    getSensorData()
-      .then(({ generated_at }) => {
-        document.getElementById('stamp').textContent =
-          'Last Updated ' + new Date(generated_at).toLocaleString();
-      })
-      .catch(() => {
-        document.getElementById('stamp').textContent =
-          '⚠ Unable to fetch latest data';
-      });
   </script>
 </body>
 </html>
