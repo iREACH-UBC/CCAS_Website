@@ -1,4 +1,5 @@
 // js/details.js – fixed 24-h window, date label at midnight, cross-hair tracker
+// + remembers last sensor / pollutant across reloads
 import { getSensorData } from './data.js';
 
 /* ---------- Constants ---------------------------------------------------- */
@@ -25,6 +26,37 @@ const UNITS = {
 // CSV column indices that never move
 const FIXED = { CO: 3, NO: 4, NO2: 5, O3: 6, CO2: 7 };
 
+/* ---------- Persistence helpers ----------------------------------------- */
+
+const STORAGE_KEY = 'ccas.detailedView';
+
+function saveState (sensor, pollutant) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ sensor, pollutant }));
+  const qs = new URLSearchParams({ sensor, pollutant });
+  history.replaceState({}, '', `${location.pathname}?${qs.toString()}`);
+}
+
+function loadState (sensors) {
+  // 1️⃣ Try URL parameters first
+  const params          = new URLSearchParams(location.search);
+  let sensor     = params.get('sensor');
+  let pollutant  = params.get('pollutant');
+
+  // 2️⃣ Fall back to localStorage
+  if (!sensor || !pollutant) {
+    try {
+      ({ sensor, pollutant } = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {});
+    } catch (_) { /* ignore */ }
+  }
+
+  // 3️⃣ Validate
+  const validSensor     = sensors.find(s => s.id === sensor)?.id ?? sensors[0]?.id;
+  const validPollutants = ['PM2.5', ...Object.keys(UNITS)];
+  const validPollutant  = validPollutants.includes(pollutant) ? pollutant : 'PM2.5';
+
+  return { sensor: validSensor, pollutant: validPollutant };
+}
+
 /* ---------- DOM ---------------------------------------------------------- */
 
 const sensorSel    = document.getElementById('sensor-select');
@@ -37,16 +69,23 @@ let chart;
 
 init();
 async function init () {
-  const { sensors } = await getSensorData();
+  const { sensors }   = await getSensorData();
   sensors.forEach(s => sensorSel.add(new Option(s.name || s.id, s.id)));
 
-  sensorSel.value    = sensors[0]?.id;
-  pollutantSel.value = 'PM2.5';
+  const state         = loadState(sensors);
+  sensorSel.value     = state.sensor;
+  pollutantSel.value  = state.pollutant;
 
-  sensorSel.addEventListener('change', drawChart);
-  pollutantSel.addEventListener('change', drawChart);
+  sensorSel.addEventListener('change', () => {
+    saveState(sensorSel.value, pollutantSel.value);
+    drawChart();
+  });
+  pollutantSel.addEventListener('change', () => {
+    saveState(sensorSel.value, pollutantSel.value);
+    drawChart();
+  });
 
-  await drawChart();
+  await drawChart();                    // first render
 }
 
 /* ---------- Chart-drawing ------------------------------------------------ */
@@ -59,19 +98,16 @@ async function drawChart () {
   /* ----- Choose column --------------------------------------------------- */
   const len = sensor.history[0].length;
   const idx = pollutantSel.value === 'PM2.5'
-    ? len - 1            // PM2.5 lives at the end
+    ? len - 1
     : FIXED[pollutantSel.value];
 
   /* ----- Define exact 24-h window --------------------------------------- */
-  // Latest reading in file
   const lastDt = new Date(sensor.history.at(-1)[0]);
-
-  // Round *up* to next full hour so we never chop off the tail
   if (lastDt.getMinutes() || lastDt.getSeconds() || lastDt.getMilliseconds()) {
     lastDt.setHours(lastDt.getHours() + 1, 0, 0, 0);
   }
-  const tMax = +lastDt;                     // ms since epoch
-  const tMin = tMax - 24 * 60 * 60 * 1000;  // back exactly 24 h
+  const tMax = +lastDt;
+  const tMin = tMax - 24 * 60 * 60 * 1000;
 
   /* ----- Build dataset --------------------------------------------------- */
   const points = sensor.history
@@ -90,11 +126,10 @@ async function drawChart () {
       `<p style="padding:1rem;color:#c00">No data for ${pollutantSel.value} at ${sensor.name || sensor.id}</p>`;
     return;
   }
-  
-// Update footer with last-seen timestamp for this sensor
-document.getElementById('stamp').textContent =
-  'Last seen ' + new Date(sensor.history.at(-1)[0]).toLocaleString();
 
+  // Update footer with last-seen timestamp for this sensor
+  document.getElementById('stamp').textContent =
+    'Last seen ' + new Date(sensor.history.at(-1)[0]).toLocaleString();
 
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
@@ -112,10 +147,7 @@ document.getElementById('stamp').textContent =
     }]},
     options: {
       responsive: true,
-      interaction: {
-        mode: 'index',    // show tooltip by x-value
-        intersect: false
-      },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         title: {
           display: true,
@@ -129,8 +161,7 @@ document.getElementById('stamp').textContent =
               `${ctx.dataset.label}: ${ctx.parsed.y ?? '—'} ${UNITS[pollutantSel.value]}`
           }
         }
-        // To add coloured AQHI bands back in, uncomment:
-        // ,yBands: BANDS[pollutantSel.value]
+        // ,yBands: BANDS[pollutantSel.value]   // uncomment to re-enable AQHI bands
       },
       scales: {
         x: {
@@ -143,7 +174,7 @@ document.getElementById('stamp').textContent =
             displayFormats: { hour: 'HH' }
           },
           ticks: {
-            autoSkip: false,           // exactly 24 ticks
+            autoSkip: false,
             callback (value) {
               const d = new Date(value);
               return d.getHours() === 0
@@ -160,7 +191,7 @@ document.getElementById('stamp').textContent =
         }
       }
     },
-    plugins: [ crosshairPlugin ]   // adds the vertical tracker line
+    plugins: [crosshairPlugin]
   });
 }
 
