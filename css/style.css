@@ -1,27 +1,20 @@
-body {
-  margin: 0;
-  font-family: sans-serif;
-}
-
-header {
-  padding: 1em;
-  background: #f0f0f0;
-}
-
+/* ── Base nav button ───────────────────────────────────────── */
 .nav-button {
+  /* spacing */
   margin-right: 10px;
-  padding: 0.5em 1em;
+  padding: 0.5em 1em;          /* or 0.2rem 0.6rem if you prefer tighter */
+
+  /* look & feel */
+  color: #fff;                 /* white text */
+  background: none;            /* transparent so the header shows through */
   text-decoration: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 5px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;  /* smooth hover */
 }
 
-#map {
-  height: 60vh;
-  width: 100%;
-}
-
-#sensor-details {
-  padding: 1em;
+/* ── Hover / focus state ───────────────────────────────────── */
+.nav-button:hover,
+.nav-button:focus {
+  background: rgba(255, 255, 255, 0.15);  /* “white filter” */
+  color: #fff;                            /* stays white */
 }
