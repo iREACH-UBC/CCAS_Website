@@ -1,64 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Community AQHI Dashboard</title>
 
-  <!-- Main stylesheet -->
-  <link rel="stylesheet" href="css/style.css" />
-
-  <!-- Fallback styles if css/style.css is still minimal -->
-  <style>
-    body { margin:0; font-family:system-ui,sans-serif; display:flex; flex-direction:column; min-height:100vh; }
-    header { background:#004b8d; color:#fff; padding:2.5rem 1rem 3rem; text-align:center; }
-    header h1 { margin:0 0 .5rem; font-size:2rem; }
-    .tagline { font-weight:300; margin:0; }
-
-    nav { margin-top:1.5rem; display:flex; justify-content:center; flex-wrap:wrap; gap:.6rem; }
-    .nav-button {
-      color:#fff;
-      text-decoration:none;
-      font-weight:500;
-      padding:0.5rem 1rem;
-      background:rgba(255,255,255,0.2);
-      border-radius:6px;
-      transition:background 0.2s, transform 0.2s;
-      display:inline-block;
-    }
-    .nav-button:hover {
-      background:rgba(255,255,255,0.4);
-      transform:translateY(-2px);
-    }
-
-    .cards { display:grid; gap:1rem; padding:2rem 1rem; flex:1; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
-    .card  { text-decoration:none; color:#004b8d; background:#e6f1ff; padding:2rem 1rem; border-radius:10px; font-size:1.25rem; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:.18s transform; }
-    .card:hover { transform:translateY(-3px); }
-
-    footer { text-align:center; padding:1rem 0 1.5rem; font-size:.9rem; color:#666; }
-  </style>
+  <!-- Mobile‑first main stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-  <header>
-    <h1>Community Clean Air Spaces Dashboard</h1>
-    <p class="tagline">Real-time data from a study led by the Univeristy of British Columbia and Vancouver Coastal Health. Please view our Info page for more permanent resources!</p>
-    <nav>
+  <!-- Skip‑link for accessibility -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ── Header & Nav ───────────────────────────────────────────── -->
+  <header class="site-header">
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
+      <span class="visually-hidden">Menu</span>☰
+    </button>
+    <h1 class="logo">Community Clean Air Spaces Dashboard</h1>
+
+    <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
-      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
-  
-  <section class="cards">
-    <a class="card" href="map.html">Interactive&nbsp;Map</a>
-    <a class="card" href="details.html">Graphs</a>
-    <a class="card" href="list.html">Sensor&nbsp;List</a>
-    <a class="card" href="info.html">Info&nbsp;and&nbsp;Resources</a>
-  </section>
 
-  </script>
+  <!-- ── Main Content ───────────────────────────────────────────── -->
+  <main id="main">
+    <p class="tagline">Real‑time data from a study led by the University of British Columbia and Vancouver Coastal Health. View the Info page for more resources!</p>
+
+    <section class="cards">
+      <a class="card" href="map.html">Interactive&nbsp;Map</a>
+      <a class="card" href="details.html">Graphs</a>
+      <a class="card" href="list.html">Sensor&nbsp;List</a>
+      <a class="card" href="info.html">Info&nbsp;&amp;&nbsp;Resources</a>
+    </section>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    © 2025 Community Clean Air Spaces Study – University of British Columbia
+  </footer>
+
+  <!-- Hamburger toggle script -->
+  <script src="js/menu.js" defer></script>
 </body>
 </html>
