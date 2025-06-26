@@ -1,20 +1,153 @@
-/* ── Base nav button ───────────────────────────────────────── */
-.nav-button {
-  /* spacing */
-  margin-right: 10px;
-  padding: 0.5em 1em;          /* or 0.2rem 0.6rem if you prefer tighter */
+/*──────────────────────────────────────────────────────────────
+  Community AQHI Dashboard – unified stylesheet
+  Mobile-first design: small screens first, scale up with media
+──────────────────────────────────────────────────────────────*/
 
-  /* look & feel */
-  color: #fff;                 /* white text */
-  background: none;            /* transparent so the header shows through */
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.15s ease;  /* smooth hover */
+/* 0️⃣  Theme variables */
+:root{
+  --brand:    #004b8d;   /* header & primary accents */
+  --text:     #ffffff;   /* on-brand foreground */
+  --bg:       #f5f7fa;   /* page background */
+  --card-bg:  #e6f1ff;   /* card tiles */
+  --radius:   6px;       /* rounded corners */
 }
 
-/* ── Hover / focus state ───────────────────────────────────── */
+/* 1️⃣  Resets & global layout */
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+main{flex:1;padding:1rem;}
+img{max-width:100%;height:auto;display:block;}
+
+/* 2️⃣  Accessibility helpers */
+.skip-link{
+  position:absolute;
+  left:-999px;
+  top:auto;
+  background:var(--brand);
+  color:var(--text);
+  padding:.5rem 1rem;
+  z-index:100;
+}
+.skip-link:focus{left:0;}
+
+/* 3️⃣  Header & navigation */
+.site-header{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:.6rem 1rem;
+  background:var(--brand);
+  color:var(--text);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.logo{
+  margin:0;
+  font-size:1.25rem;
+  font-weight:600;
+}
+
+/* hamburger → hidden on desktop */
+.hamburger{
+  background:none;
+  border:none;
+  font-size:1.6rem;
+  color:var(--text);
+  cursor:pointer;
+  line-height:1;
+  display:none;            /* shows via media query */
+}
+
+/* nav container */
+.nav{
+  display:flex;
+  gap:.6rem;
+  margin-left:auto;
+  flex-wrap:wrap;
+}
+
+/* 4️⃣  Nav buttons – “white filter” style */
+.nav-button{
+  display:inline-block;
+  padding:.5rem 1rem;
+  color:var(--text);
+  background:none;
+  text-decoration:none;
+  border-radius:var(--radius);
+  transition:background-color .15s ease, transform .15s ease;
+}
 .nav-button:hover,
-.nav-button:focus {
-  background: rgba(255, 255, 255, 0.15);  /* “white filter” */
-  color: #fff;                            /* stays white */
+.nav-button:focus{
+  background:rgba(255,255,255,.15);
+  transform:translateY(-2px);
+}
+
+/* 5️⃣  Cards grid (home page quick links) */
+.cards{
+  display:grid;
+  gap:1rem;
+  padding:2rem 1rem;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+.card{
+  background:var(--card-bg);
+  color:var(--brand);
+  text-decoration:none;
+  font-size:1.25rem;
+  padding:2rem 1rem;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .18s ease;
+}
+.card:hover,
+.card:focus{transform:translateY(-3px);}
+
+/* 6️⃣  Footer */
+.site-footer{
+  text-align:center;
+  padding:1rem 0;
+  font-size:.9rem;
+  color:#666;
+}
+
+/* 7️⃣  Small-screen adjustments (≤640 px) */
+@media(max-width:640px){
+  .hamburger{display:inline-block;}   /* show burger */
+  .nav{
+    display:none;                     /* hidden until burger tap */
+    flex-direction:column;
+    gap:.4rem;
+    margin-left:0;
+    width:100%;
+  }
+  .nav.open{display:flex;}            /* toggled by JS */
+  .logo{font-size:1rem;flex:1;}
+  .nav-button{
+    width:100%;
+    margin:0;
+    text-align:center;
+    padding:.75rem 1rem;
+  }
+}
+
+/* 8️⃣  Tablet / small-desktop extras (≥641 px) */
+@media(min-width:641px){
+  main{padding:1.5rem 2rem;}
+}
+
+/* 9️⃣  Large desktop tweaks (≥1024 px) */
+@media(min-width:1024px){
+  main{padding:2rem 3rem;}
 }
