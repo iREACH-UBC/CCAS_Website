@@ -15,13 +15,16 @@
     body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;background:#f5f7fa;}
     main{flex:1;padding:1rem;}
 
+    /* assistive text helper */
+    .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
     /* skip‑link (a11y) */
     .skip-link{position:absolute;left:-999px;top:auto;background:var(--brand);color:var(--text);padding:.5rem 1rem;z-index:100;}
     .skip-link:focus{left:0;}
 
     /* header & nav */
     .site-header{display:flex;align-items:center;gap:1rem;padding:.6rem 1rem;background:var(--brand);color:var(--text);position:sticky;top:0;z-index:50;}
-    .logo{margin:0;font-size:1.25rem;font-weight:600;}
+    .logo{margin:0;font-size:1.25rem;font-weight:600;flex:1;}
     .hamburger{background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;line-height:1;display:none;}
 
     .nav{display:flex;gap:.6rem;margin-left:auto;flex-wrap:wrap;}
@@ -41,7 +44,7 @@
       .hamburger{display:inline-block;}      /* show burger   */
       .nav{display:none;flex-direction:column;gap:.4rem;margin-left:0;width:100%;}
       .nav.open{display:flex;}               /* toggled by JS */
-      .logo{font-size:1rem;flex:1;}
+      .logo{font-size:1rem;}
     }
   </style>
 </head>
@@ -49,9 +52,6 @@
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
-    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
-      <span class="visually-hidden">Menu</span>☰
-    </button>
     <h1 class="logo">Community Clean Air Spaces Dashboard</h1>
 
     <nav id="site-nav" class="nav">
@@ -61,6 +61,10 @@
       <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
+
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
+      <span class="visually-hidden">Menu</span>☰
+    </button>
   </header>
 
   <main id="main">
@@ -78,7 +82,7 @@
     © 2025 Community Clean Air Spaces Study – University of British Columbia
   </footer>
 
-  <!-- External hamburger toggle script -->
+  <!-- Hamburger toggle script -->
   <script src="js/menu.js" defer></script>
 </body>
 </html>
