@@ -2,62 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sensor List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CCAS Dashboard – Sensor List</title>
 
+  <!-- Shared stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Basic fallback styles if style.css is empty -->
+  <!-- Minimal fallback so page stays readable if style.css fails to load -->
   <style>
-    body { margin:0; font-family:system-ui,sans-serif; }
-    header {
-      padding:.6rem 1rem;
-      background:#004b8d;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      flex-wrap:wrap;
+    :root{--brand:#004b8d;--text:#fff;--radius:6px;}
+    body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
+    main{flex:1;padding:1rem;max-width:900px;margin:auto;}
+
+    /* header & nav (desktop row, collapsible on phones) */
+    .site-header{display:flex;align-items:center;gap:1rem;padding:.6rem 1rem;background:var(--brand);color:var(--text);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+    .logo{order:1;flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
+    .logo:hover,.logo:focus{text-decoration:none;}
+    .hamburger{order:2;background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;line-height:1;display:none;}
+    .nav{order:3;display:flex;gap:.6rem;flex-wrap:wrap;width:100%;}
+    .nav-button{color:var(--text);text-decoration:none;padding:.5rem 1rem;border-radius:var(--radius);background:rgba(255,255,255,.15);transition:background .15s,transform .15s;}
+    .nav-button:hover,.nav-button:focus{background:rgba(255,255,255,.3);transform:translateY(-2px);}
+
+    /* mobile behaviour */
+    @media(max-width:640px){
+      .hamburger{display:inline-block;}
+      .nav{display:none;flex-direction:column;gap:.4rem;width:100%;margin-left:0;}
+      .nav.open{display:flex;}
+      .logo{font-size:1rem;}
     }
-    header h1 {
-      margin:0;
-      font-size:1.2rem;
-    }
-    nav {
-      display:flex;
-      gap:.6rem;
-      flex-wrap:wrap;
-    }
-    .nav-button {
-      color:#fff;
-      text-decoration:none;
-      padding:.2rem .6rem;
-      border-radius:4px;
-    }
-    .nav-button:hover {
-      background:rgba(255,255,255,.15);
-    }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:.45rem .7rem; border-bottom:1px solid #ddd; text-align:left; }
-    th { cursor:pointer; user-select:none; }
-    tbody tr:hover { background:#f5faff; }
-    main { padding:1rem; max-width:900px; margin:auto; }
+
+    /* table styling (unchanged) */
+    table{width:100%;border-collapse:collapse;}
+    th,td{padding:.45rem .7rem;border-bottom:1px solid #ddd;text-align:left;}
+    th{cursor:pointer;user-select:none;}
+    tbody tr:hover{background:#f5faff;}
+
+    footer#stamp{text-align:center;padding:.5rem;font-size:.9rem;background:#f4f4f4;color:#333;}
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Air Quality Dashboard</h1>
-    <nav>
+  <a class="visually-hidden skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">CCAS Dashboard</a>
+
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false"><span class="visually-hidden">Menu</span>☰</button>
+
+    <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
-      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
 
-  <main>
+  <main id="main">
     <table id="sensor-table">
       <thead>
         <tr>
@@ -72,10 +73,12 @@
     </table>
   </main>
 
-  <script type="module" src="js/list.js"></script>
   <footer id="stamp">Updating&hellip;</footer>
 
-  <!-- load the JSON once to show last-generated time -->
+  <!-- list page logic -->
+  <script type="module" src="js/list.js"></script>
+
+  <!-- last‑updated time fetcher -->
   <script type="module">
     import { getSensorData } from './js/data.js';
     getSensorData()
@@ -84,9 +87,11 @@
           'Last Updated ' + new Date(generated_at).toLocaleString();
       })
       .catch(() => {
-        document.getElementById('stamp').textContent =
-          '⚠ Unable to fetch latest data';
+        document.getElementById('stamp').textContent = '⚠ Unable to fetch latest data';
       });
   </script>
+
+  <!-- hamburger toggle script -->
+  <script src="js/menu.js" defer></script>
 </body>
 </html>
