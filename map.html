@@ -2,99 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Air Quality Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CCAS Dashboard – Interactive Map</title>
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <!-- Leaflet core CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Your main stylesheet -->
+  <!-- Shared site stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Fallback and structural styles -->
+  <!-- Fallback / page‑specific styles (only minimal) -->
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+    :root{--brand:#004b8d;--text:#fff;--radius:6px;}
+    html,body{margin:0;height:100%;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
+    main{flex:1;display:flex;flex-direction:column;}
+
+    /* header */
+    .site-header{display:flex;align-items:center;gap:1rem;padding:.6rem 1rem;background:var(--brand);color:var(--text);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+    .logo{order:1;flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
+    .logo:hover,.logo:focus{text-decoration:none;}
+    .hamburger{order:2;background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;line-height:1;display:none;}
+    .nav{order:3;display:flex;gap:.6rem;flex-wrap:wrap;width:100%;}
+    .nav-button{color:var(--text);text-decoration:none;padding:.5rem 1rem;border-radius:var(--radius);background:rgba(255,255,255,.15);transition:background .15s,transform .15s;}
+    .nav-button:hover,.nav-button:focus{background:rgba(255,255,255,.3);transform:translateY(-2px);}
+
+    /* mobile collapse */
+    @media(max-width:640px){
+      .hamburger{display:inline-block;}
+      .nav{display:none;flex-direction:column;gap:.4rem;width:100%;margin-left:0;}
+      .nav.open{display:flex;}
+      .logo{font-size:1rem;}
     }
-  
-    header {
-      padding: 0.6rem 1rem;
-      background: #004b8d;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-  
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-  
-    nav {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-  
-    .nav-button {
-      color: #fff;
-      text-decoration: none;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-    }
-  
-    .nav-button:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-  
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-  
-    #map {
-      flex: 1;
-      width: 100%;
-    }
-  
-    #sensor-details {
-      display: none;
-    }
-  
-    footer#stamp {
-      text-align: center;
-      padding: 0.5rem;
-      font-size: 0.9rem;
-      background: #f4f4f4;
-      color: #333;
-    }
+
+    /* map container – ensure usable on mobile */
+    #map{flex:1;width:100%;min-height:70vh;touch-action:none;} /* touch-action allows pinch/drag inside map */
+    #sensor-details{display:none;}
+
+    footer#stamp{text-align:center;padding:.5rem;font-size:.9rem;background:#f4f4f4;color:#333;}
   </style>
-
 </head>
-
 <body>
-  <header>
-    <h1>Air Quality Dashboard</h1>
-    <nav>
+  <a class="visually-hidden skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">CCAS Dashboard</a>
+
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false"><span class="visually-hidden">Menu</span>☰</button>
+
+    <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
-      <a class="nav-button" href="list.html">Sensor List</a>
+      <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
 
-  <main>
+  <main id="main">
     <div id="map"></div>
     <div id="sensor-details"></div>
   </main>
@@ -104,10 +68,10 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Map logic (ES-module) -->
+  <!-- Map logic (ES‑module) -->
   <script type="module" src="js/map.js"></script>
 
-  <!-- Fetch and display last updated timestamp -->
+  <!-- Timestamp fetcher -->
   <script type="module">
     import { getSensorData } from './js/data.js';
     getSensorData()
@@ -120,5 +84,8 @@
           '⚠ Unable to fetch latest data';
       });
   </script>
+
+  <!-- hamburger toggle script -->
+  <script src="js/menu.js" defer></script>
 </body>
 </html>

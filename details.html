@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>CCAS Dashboard – Graphs (24 h)</title>
+  <title>CCAS Dashboard – Graphs (24 h)</title>
 
   <!-- Shared stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
@@ -20,6 +20,7 @@
     /* header & nav */
     .site-header{display:flex;align-items:center;gap:1rem;padding:.6rem 1rem;background:var(--brand);color:var(--text);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
     .logo{order:1;flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
+    .logo:hover,.logo:focus{text-decoration:none;}
     .hamburger{order:2;background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;line-height:1;display:none;}
     .nav{order:3;display:flex;gap:.6rem;flex-wrap:wrap;width:100%;}
     .nav-button{color:var(--text);text-decoration:none;padding:.5rem 1rem;border-radius:var(--radius);background:rgba(255,255,255,.15);transition:background .15s,transform .15s;}
@@ -35,14 +36,11 @@
 
     /* page‑specific – selectors row */
     .selectors{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1rem;}
+    /* bigger touch targets for selects */
+    .selectors select{padding:.6rem 1rem;font-size:1rem;border-radius:var(--radius);}   
     canvas{max-width:100%;}
 
     footer{padding:1rem;text-align:center;font-size:.9rem;color:#666;}
-
-/* prevent underline on logo link */
-.logo:hover,
-.logo:focus{ text-decoration:none; }
-  }
   </style>
 
   <!-- Chart.js core + adapter -->
