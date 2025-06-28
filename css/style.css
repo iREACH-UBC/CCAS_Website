@@ -1,11 +1,11 @@
 /*──────────────────────────────────────────────────────────────
-  Community AQHI Dashboard – unified stylesheet  (v2025-06-27)
-  Mobile-first: small screens first, scale up with media
+  Community AQHI Dashboard – unified stylesheet  (v2025-06-27b)
+  Mobile-first design
 ──────────────────────────────────────────────────────────────*/
 
 /* 0️⃣  Theme variables */
 :root{
-  --brand:    #004b8d;  /* header & accents */
+  --brand:    #004b8d;
   --text:     #ffffff;
   --bg:       #f5f7fa;
   --card-bg:  #e6f1ff;
@@ -14,17 +14,14 @@
 
 /* 1️⃣  Resets & global layout */
 *,*::before,*::after{box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-html,body{max-width:100%;overflow-x:hidden;}        /* stop horizontal bleed */
+html{scroll-behavior:smooth;max-width:100%;}
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+  display:flex;flex-direction:column;min-height:100vh;max-width:100%;
 }
-main{flex:1;padding:1rem;box-sizing:border-box;}
+main{flex:1;padding:1rem;box-sizing:border-box;max-width:100%;}
 img{max-width:100%;height:auto;display:block;}
 
 /* 2️⃣  Accessibility helpers */
@@ -52,7 +49,7 @@ img{max-width:100%;height:auto;display:block;}
 }
 .nav-button:hover,.nav-button:focus{background:rgba(255,255,255,.15);transform:translateY(-2px);}
 
-/* 4️⃣  Cards grid (home page quick links) */
+/* 4️⃣  Cards grid (home page) */
 .cards{display:grid;gap:1rem;padding:2rem 1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
 .card{
   background:var(--card-bg);color:var(--brand);text-decoration:none;font-size:1.25rem;
@@ -70,21 +67,21 @@ img{max-width:100%;height:auto;display:block;}
 /* 6️⃣  Footer */
 .site-footer{text-align:center;padding:1rem 0;font-size:.9rem;color:#666;}
 
-/* 7️⃣  Small-screen adjustments (≤640 px) */
+/* 7️⃣  Small-screen (≤640 px) */
 @media (max-width:640px){
   .hamburger{display:inline-block;}
   .nav{display:none;flex-direction:column;gap:.4rem;width:100%;margin-left:0;}
-  .nav.open{display:flex;}
+  .nav.open{display:flex !important;}      /* always override ‘none’ */
   .logo{font-size:1rem;flex:1;}
   .nav-button{width:100%;margin:0;text-align:center;padding:.75rem 1rem;}
 }
 
-/* 8️⃣  Tablet / small-desktop extras (≥641 px) */
+/* 8️⃣  Tablet (≥641 px) */
 @media (min-width:641px){
   main{padding:1.5rem 2rem;}
 }
 
-/* 9️⃣  Large desktop tweaks (≥1024 px) */
+/* 9️⃣  Desktop (≥1024 px) */
 @media (min-width:1024px){
   main{padding:2rem 3rem;}
 }

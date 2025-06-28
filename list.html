@@ -8,13 +8,13 @@
   <!-- Shared stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Minimal fallback so the page stays readable if style.css fails -->
+  <!-- Minimal fallback if style.css fails -->
   <style>
     :root{--brand:#004b8d;--text:#fff;--radius:6px;}
     body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
     main{flex:1;padding:1rem;max-width:900px;margin:auto;box-sizing:border-box;}
 
-    /* basic header/nav for no-CSS case */
+    /* simple header/nav fallback */
     .site-header{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:.6rem 1rem;background:var(--brand);color:var(--text);}
     .logo{flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
     .hamburger{display:none;background:none;border:none;font-size:1.6rem;color:var(--text);}
@@ -30,7 +30,6 @@
   <header class="site-header">
     <a href="index.html" class="logo">CCAS Dashboard</a>
 
-    <!-- hamburger (label hidden by screen-reader-only class) -->
     <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
       <span class="visually-hidden">Menu</span>☰
     </button>
@@ -45,18 +44,21 @@
   </header>
 
   <main id="main">
-    <table id="sensor-table">
-      <thead>
-        <tr>
-          <th data-key="id">ID ▲</th>
-          <th data-key="name">Name</th>
-          <th data-key="aqhi">AQHI</th>
-          <th data-key="primary">Main&nbsp;Contributor</th>
-          <th data-key="timestamp">Last&nbsp;Update</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <!-- horizontal scroll wrapper prevents “smush” on tiny screens -->
+    <div style="overflow-x:auto;">
+      <table id="sensor-table">
+        <thead>
+          <tr>
+            <th data-key="id">ID ▲</th>
+            <th data-key="name">Name</th>
+            <th data-key="aqhi">AQHI</th>
+            <th data-key="primary">Main&nbsp;Contributor</th>
+            <th data-key="timestamp">Last&nbsp;Update</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </main>
 
   <footer id="stamp" class="site-footer">Updating&hellip;</footer>
@@ -64,7 +66,7 @@
   <!-- sensor-list logic -->
   <script type="module" src="js/list.js"></script>
 
-  <!-- last-generated time fetcher -->
+  <!-- last-generated time -->
   <script type="module">
     import { getSensorData } from './js/data.js';
     getSensorData()
