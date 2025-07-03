@@ -92,9 +92,9 @@
     /* ─── Sensor table — tidy, tabular look ─────────────────────── */
     #sensor-table{
       width:100%;
-      border-collapse:collapse;    /* join cell borders               */
+      border-collapse:collapse;
       border-spacing:0;
-      table-layout:auto;           /* let columns size to content      */
+      table-layout:auto;
       font-size:0.95rem;
     }
   
@@ -102,7 +102,7 @@
     #sensor-table td{
       padding:.45rem .8rem;
       border-bottom:1px solid #d0d7de;
-      white-space:nowrap;          /* keep each cell on one line       */
+      white-space:nowrap;           /* default: keep single-line       */
     }
   
     #sensor-table thead th{
@@ -111,7 +111,7 @@
     }
   
     #sensor-table tbody tr:nth-child(even){
-      background:#f8fbff;          /* subtle zebra striping            */
+      background:#f8fbff;           /* subtle zebra striping           */
     }
   
     /* numeric columns: right-align & use tabular figures */
@@ -122,7 +122,26 @@
       text-align:right;
       font-variant-numeric:tabular-nums;
     }
+  
+    /* --- Extra-small screens (≤480 px): allow wrapping ------------ */
+    @media(max-width:480px){
+      /* permit multi-line in Name & Main-Contributor cols + headers */
+      #sensor-table th[data-key="name"],
+      #sensor-table th[data-key="primary"],
+      #sensor-table td:nth-child(2),
+      #sensor-table td:nth-child(4){
+        white-space:normal;         /* re-enable wrapping              */
+        word-break:break-word;      /* wrap long words if needed       */
+      }
+  
+      /* slightly smaller header text so two-line labels fit nicely */
+      #sensor-table thead th{
+        font-size:0.8rem;
+        line-height:1.25;
+      }
+    }
   </style>
+
 </head>
 
 <body>
