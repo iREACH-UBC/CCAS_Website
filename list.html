@@ -10,137 +10,74 @@
 
   <!-- Minimal fallback if style.css fails -->
   <style>
-    /* ─── Root palette & simple layout ───────────────────────────── */
-    :root{
-      --brand:#004b8d;        /* header & primary accents            */
-      --text:#ffffff;         /* on-brand foreground                 */
-      --radius:6px;           /* rounded corners                     */
-      --card-bg:#e6f1ff;      /* light blue header / card background */
+  /* ─── Root palette & simple layout ───────────────────────────── */
+  :root{
+    --brand:#004b8d;
+    --text:#ffffff;
+    --radius:6px;
+    --card-bg:#e6f1ff;
+  }
+
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+
+  main{flex:1;padding:1rem;max-width:900px;margin:auto;box-sizing:border-box;}
+
+  /* ─── Header & nav ───────────────────────────────────────────── */
+  .site-header{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+               padding:.6rem 1rem;background:var(--brand);color:var(--text);}
+  .logo{flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
+  .hamburger{display:none;background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;}
+  .nav{display:flex;gap:.6rem;flex-wrap:wrap;width:100%;}
+  .nav-button{color:var(--text);text-decoration:none;padding:.5rem 1rem;border-radius:var(--radius);
+              background:rgba(255,255,255,.15);}
+
+  /* Mobile ≤ 640 px: hide nav until burger tapped */
+  @media(max-width:640px){
+    .hamburger{display:inline-block;}
+    #site-nav{display:none;flex-direction:column;width:100%;margin-top:.5rem;}
+    #site-nav.open{display:flex;}
+  }
+
+  /* ─── Sensor table ───────────────────────────────────────────── */
+  #sensor-table{width:100%;border-collapse:collapse;font-size:0.95rem;}
+  #sensor-table th,#sensor-table td{padding:.45rem .8rem;border-bottom:1px solid #d0d7de;white-space:nowrap;}
+  #sensor-table thead th{background:var(--card-bg);font-weight:600;}
+  #sensor-table tbody tr:nth-child(even){background:#f8fbff;}
+
+  /* numeric columns aligned right */
+  #sensor-table th[data-key="id"],
+  #sensor-table td:nth-child(1),
+  #sensor-table th[data-key="aqhi"],
+  #sensor-table td:nth-child(3){
+    text-align:right;font-variant-numeric:tabular-nums;
+  }
+
+  /* ─── Small-screen tweaks ≤ 480 px ───────────────────────────── */
+  @media(max-width:480px){
+    /* Wrap long labels & values softly (break only at spaces / hyphenation) */
+    #sensor-table th[data-key="name"],
+    #sensor-table th[data-key="primary"],
+    #sensor-table td:nth-child(2),
+    #sensor-table td:nth-child(4){
+      white-space:normal;          /* allow wrapping               */
+      word-break:keep-all;         /* keep whole words together    */
+      overflow-wrap:break-word;    /* last-resort for super-long   */
+      hyphens:auto;                /* smart hyphenation if needed  */
     }
-  
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
+
+    /* Let “Last Seen” header wrap to two lines */
+    #sensor-table th[data-key="timestamp"]{
+      white-space:normal;
     }
-  
-    main{
-      flex:1;
-      padding:1rem;
-      max-width:900px;
-      margin:auto;
-      box-sizing:border-box;
-    }
-  
-    /* ─── Header / nav fallback ──────────────────────────────────── */
-    .site-header{
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      flex-wrap:wrap;
-      padding:.6rem 1rem;
-      background:var(--brand);
-      color:var(--text);
-    }
-    .logo{
-      flex:1;
-      font-size:1.2rem;
-      font-weight:600;
-      color:var(--text);
-      text-decoration:none;
-    }
-    .hamburger{
-      display:none;                 /* shown only on small screens     */
-      background:none;
-      border:none;
-      font-size:1.6rem;
-      color:var(--text);
-      cursor:pointer;
-    }
-    .nav{
-      display:flex;                 /* desktop default                 */
-      gap:.6rem;
-      flex-wrap:wrap;
-      width:100%;
-    }
-    .nav-button{
-      color:var(--text);
-      text-decoration:none;
-      padding:.5rem 1rem;
-      border-radius:var(--radius);
-      background:rgba(255,255,255,.15);
-    }
-  
-    /* --- Mobile (≤640 px) ---------------------------------------- */
-    @media(max-width:640px){
-      .hamburger{display:inline-block;}
-  
-      /* hide nav until “open” */
-      #site-nav{
-        display:none;
-        flex-direction:column;
-        width:100%;
-        margin-top:.5rem;
-      }
-      #site-nav.open{
-        display:flex;               /* JS toggles this class           */
-      }
-    }
-  
-    /* ─── Sensor table — tidy, tabular look ─────────────────────── */
-    #sensor-table{
-      width:100%;
-      border-collapse:collapse;
-      border-spacing:0;
-      table-layout:auto;
-      font-size:0.95rem;
-    }
-  
-    #sensor-table th,
-    #sensor-table td{
-      padding:.45rem .8rem;
-      border-bottom:1px solid #d0d7de;
-      white-space:nowrap;           /* default: keep single-line       */
-    }
-  
-    #sensor-table thead th{
-      background:var(--card-bg);
-      font-weight:600;
-    }
-  
-    #sensor-table tbody tr:nth-child(even){
-      background:#f8fbff;           /* subtle zebra striping           */
-    }
-  
-    /* numeric columns: right-align & use tabular figures */
-    #sensor-table th[data-key="id"],
-    #sensor-table td:nth-child(1),
-    #sensor-table th[data-key="aqhi"],
-    #sensor-table td:nth-child(3){
-      text-align:right;
-      font-variant-numeric:tabular-nums;
-    }
-  
-    /* --- Extra-small screens (≤480 px): allow wrapping ------------ */
-    @media(max-width:480px){
-      /* permit multi-line in Name & Main-Contributor cols + headers */
-      #sensor-table th[data-key="name"],
-      #sensor-table th[data-key="primary"],
-      #sensor-table td:nth-child(2),
-      #sensor-table td:nth-child(4){
-        white-space:normal;         /* re-enable wrapping              */
-        word-break:break-word;      /* wrap long words if needed       */
-      }
-  
-      /* slightly smaller header text so two-line labels fit nicely */
-      #sensor-table thead th{
-        font-size:0.8rem;
-        line-height:1.25;
-      }
-    }
-  </style>
+
+    /* slightly smaller header text to fit two-line labels */
+    #sensor-table thead th{font-size:0.8rem;line-height:1.25;}
+  }
+</style>
 
 </head>
 
@@ -173,7 +110,8 @@
             <th data-key="name">Name</th>
             <th data-key="aqhi">AQHI</th>
             <th data-key="primary">Main&nbsp;Contributor</th>
-            <th data-key="timestamp">Last&nbsp;Update</th>
+            <!-- ⬇︎ was “Last Update” -->
+            <th data-key="timestamp">Last&nbsp;Seen</th>
           </tr>
         </thead>
         <tbody></tbody>
