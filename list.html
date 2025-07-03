@@ -49,8 +49,6 @@
   #sensor-table tbody tr:nth-child(even){background:#f8fbff;}
 
   /* numeric columns aligned right */
-  #sensor-table th[data-key="id"],
-  #sensor-table td:nth-child(1),
   #sensor-table th[data-key="aqhi"],
   #sensor-table td:nth-child(3){
     text-align:right;font-variant-numeric:tabular-nums;
@@ -106,8 +104,7 @@
       <table id="sensor-table">
         <thead>
           <tr>
-            <th data-key="id">ID ▲</th>
-            <th data-key="name">Name</th>
+            <th data-key="name">Name ▲</th>
             <th data-key="aqhi">AQHI</th>
             <th data-key="primary">Main&nbsp;Contributor</th>
             <!-- ⬇︎ was “Last Update” -->
