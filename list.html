@@ -52,14 +52,15 @@
       text-decoration:none;
     }
     .hamburger{
-      display:none;
+      display:none;                 /* shown only on small screens     */
       background:none;
       border:none;
       font-size:1.6rem;
       color:var(--text);
+      cursor:pointer;
     }
     .nav{
-      display:flex;
+      display:flex;                 /* desktop default                 */
       gap:.6rem;
       flex-wrap:wrap;
       width:100%;
@@ -71,8 +72,21 @@
       border-radius:var(--radius);
       background:rgba(255,255,255,.15);
     }
+  
+    /* --- Mobile (≤640 px) ---------------------------------------- */
     @media(max-width:640px){
       .hamburger{display:inline-block;}
+  
+      /* hide nav until “open” */
+      #site-nav{
+        display:none;
+        flex-direction:column;
+        width:100%;
+        margin-top:.5rem;
+      }
+      #site-nav.open{
+        display:flex;               /* JS toggles this class           */
+      }
     }
   
     /* ─── Sensor table — tidy, tabular look ─────────────────────── */
@@ -107,13 +121,6 @@
     #sensor-table td:nth-child(3){
       text-align:right;
       font-variant-numeric:tabular-nums;
-    }
-  
-    /* keep sort arrows snug against text */
-    #sensor-table th{
-      display:flex;
-      gap:.25rem;
-      align-items:center;
     }
   </style>
 </head>
