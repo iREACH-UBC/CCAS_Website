@@ -13,5 +13,9 @@ export async function getSensorData () {
   if (!res.ok) throw new Error(`Failed to fetch JSON: ${res.status}`);
 
   _cache = await res.json();
+  
+  const blacklist = ["MOD-00616"];
+  _cache.sensors = _cache.sensors.filter(s => !blacklist.includes(s.id));
+
   return _cache;
 }
