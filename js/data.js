@@ -14,7 +14,7 @@ export async function getSensorData () {
 
   _cache = await res.json();
   
-  const blacklist = ["MOD-00616", "MOD-00625", "MOD-00632", "MOD-00631"];
+  const blacklist = ["MOD-00616", "MOD-00631"];
   _cache.sensors = _cache.sensors.filter(s => !blacklist.includes(s.id));
 
   return _cache;
