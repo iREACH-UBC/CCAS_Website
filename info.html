@@ -2,42 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
   <title>CCAS Dashboard – Info</title>
 
   <!-- Main stylesheet -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=20251029" />
 
-  <!-- Fallback styles to keep it readable even if style.css is empty -->
+  <!-- Page-specific (minimal) -->
   <style>
-    body   { margin:0; font-family:system-ui,sans-serif; }
-    header { padding:.6rem 1rem; background:#004b8d; color:#fff;
-             display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
-    header h1{ margin:0; font-size:1.2rem; }
-    nav    { display:flex; gap:.6rem; flex-wrap:wrap; }
-    .nav-button{ color:#fff; text-decoration:none; padding:.2rem .6rem; border-radius:4px; }
-    .nav-button:hover{ background:rgba(255,255,255,.15); }
-    main   { padding:1rem; max-width:900px; margin:auto; line-height:1.6; }
-    h2     { margin-top:2rem; }
-    footer { text-align:center; padding:1rem; font-size:.85rem; color:#666; }
+    /* Constrain and center the article content on this page only */
+    main.info { padding: 1rem; max-width: 900px; margin: auto; line-height: 1.7; }
+    main.info h2 { margin-top: 2rem; }
   </style>
 </head>
 
 <body>
-  <!-- ── Navigation bar ─────────────────────────────────────────────── -->
-  <header>
-    <h1>CCAS Dashboard</h1>
-    <nav>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Shared header / nav (styled by css/style.css) -->
+  <header class="site-header">
+    <a href="index.html" class="logo">CCAS Dashboard</a>
+
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
+      <span class="visually-hidden">Menu</span>☰
+    </button>
+
+    <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
-      <a class="nav-button" href="list.html">Sensor List</a>
-      <a class="nav-button" href="info.html">Info</a>
+      <a class="nav-button" href="list.html">Sensor&nbsp;List</a>
+      <a class="nav-button" href="info.html" aria-current="page">Info</a>
     </nav>
   </header>
 
-  <!-- ── Content ────────────────────────────────────────────────────── -->
-  <main>
+  <!-- Content -->
+  <main id="main" class="info">
     <h2>About the Community Clean Air Spaces Dashboard</h2>
     <p>
       This dashboard provides near-real-time air quality information for the
@@ -47,7 +50,7 @@
 
     <h2>What is AQHI?</h2>
     <p>
-      The AQHI is a 1-10+ scale that communicates the health risk associated
+      The AQHI is a 1–10+ scale that communicates the health risk associated
       with a mixture of common air pollutants. A higher value means a greater
       potential for adverse health effects. Learn more at
       <a href="https://www.canada.ca/en/environment-climate-change/services/air-quality-health-index.html" target="_blank" rel="noopener">Environment Canada</a>.
@@ -55,35 +58,35 @@
 
     <h2>How to Read the Dashboard</h2>
     <ul>
-      <li><strong>Map :</strong> Colour-coded markers show current AQHI. 
-      Click on the marker to see more information from that sensor.</li>
-      <li><strong>Graphs :</strong> Select a sensor and pollutant to see data for the past 24 hours.</li>
-      <li><strong>Sensor List :</strong> Table view of all active sensors showing current pollutant concentrations.</li>
+      <li><strong>Map:</strong> Colour-coded markers show current AQHI. Click a marker to see details for that sensor.</li>
+      <li><strong>Graphs:</strong> Select a sensor and pollutant to see data for the past 24 hours.</li>
+      <li><strong>Sensor List:</strong> Table view of all active sensors showing current pollutant concentrations.</li>
     </ul>
 
     <h2>Data Sources &amp; Methods</h2>
     <p>
-      Sensor data is updated from community monitors
-      maintained by the University of British Columbia, and calibrated using 
+      Sensor data is updated from community monitors maintained by the University of British Columbia, and calibrated using
       algorithms developed by the research team specifically for these deployments.
     </p>
 
     <h2>Limitations</h2>
     <p>
-      Low-cost sensors can drift and may be affected by humidity, temperature,
-      and cross-sensitivities. While calibration reduces these errors, it is      
-      important to always follow local governance, including air quality statements.
+      Low-cost sensors can drift and may be affected by humidity, temperature, and cross-sensitivities. While calibration
+      reduces these errors, always follow local guidance, including official air quality statements.
     </p>
 
     <h2>Contact &amp; Feedback</h2>
     <p>
-      Questions or suggestions? Email the team <a href="mailto:HelloAirQuality@mech.ubc.ca">HelloAirQuality@mech.ubc.ca</a>.
+      Questions or suggestions? Email the team at
+      <a href="mailto:HelloAirQuality@mech.ubc.ca">HelloAirQuality@mech.ubc.ca</a>.
     </p>
   </main>
 
-  <!-- ── Footer ─────────────────────────────────────────────────────── -->
-  <footer>
+  <footer class="site-footer">
     © 2025 Community Clean Air Spaces Study – University of British Columbia
   </footer>
+
+  <!-- Hamburger toggle -->
+  <script src="js/menu.js" defer></script>
 </body>
 </html>
