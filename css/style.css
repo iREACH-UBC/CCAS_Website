@@ -73,7 +73,7 @@ img{max-width:100%;height:auto;display:block;}
   padding:.5rem 1rem;                        /* home-page padding */
   font-size: clamp(1rem, .9rem + .45vw, 1.2rem);
   color:var(--text);
-  background-color: rgba(255,255,255,.15);   /* filled pill by default */
+  background-color: rgba(0,0,05,.05);   /* filled pill by default */
   text-decoration:none; border-radius: var(--radius);
   transition: background-color .15s, transform .15s;
 }
