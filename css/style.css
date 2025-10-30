@@ -59,8 +59,8 @@ img{max-width:100%;height:auto;display:block;}
 }
 
 .hamburger{
-  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.24);
-  font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem); /* close to home page */
+  background: rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.35);
+  font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem); 
   color:var(--text); cursor:pointer; line-height:1; display:none;
 }
 
