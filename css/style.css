@@ -43,7 +43,6 @@ img{max-width:100%;height:auto;display:block;}
 /* 3️⃣ Header & navigation (HOME-PAGE STYLE, shared) */
 .site-header{
   display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-  /* keep your sizing + safe-area padding */
   padding-block: var(--header-pad-y, 1.1rem);
   padding-inline: calc(var(--header-pad-x, 1.6rem) + env(safe-area-inset-left))
                   calc(var(--header-pad-x, 1.6rem) + env(safe-area-inset-right));
