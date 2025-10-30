@@ -2,56 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
   <title>CCAS Dashboard – Interactive Map</title>
 
   <!-- Leaflet core CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Shared site stylesheet -->
-  <link rel="stylesheet" href="css/style.css" />
+  <!-- Unified site stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=20251029" />
 
-  <!-- Fallback / page‑specific styles (only minimal) -->
+  <!-- Minimal page-specific styles -->
   <style>
-    :root{--brand:#004b8d;--text:#fff;--radius:6px;}
-    html,body{margin:0;height:100%;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
-    main{flex:1;display:flex;flex-direction:column;}
+    /* Make the map fill the remaining viewport; remove default main padding here */
+    main.map-page { padding: 0; display: flex; flex-direction: column; }
+    #map { flex: 1; width: 100%; min-height: 70vh; touch-action: none; }
+    #sensor-details { display: none; }
 
-    /* map container – ensure usable on mobile */
-    #map{flex:1;width:100%;min-height:70vh;touch-action:none;} /* touch-action allows pinch/drag inside map */
-    #sensor-details{display:none;}
-
-    footer#stamp{text-align:center;padding:.5rem;font-size:.9rem;background:#f4f4f4;color:#333;}
+    /* Status footer at the bottom with subtle background */
+    #stamp { text-align: center; padding: .5rem; font-size: .9rem;
+             background: #f4f4f4; color: #333; }
   </style>
 </head>
 <body>
-  <a class="visually-hidden skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
     <a href="index.html" class="logo">CCAS Dashboard</a>
 
-    <button class="hamburger" aria-controls="site-nav" aria-expanded="false"><span class="visually-hidden">Menu</span>☰</button>
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
+      <span class="visually-hidden">Menu</span>☰
+    </button>
 
     <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
-      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="map.html" aria-current="page">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
       <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
 
-  <main id="main">
+  <main id="main" class="map-page">
     <div id="map"></div>
     <div id="sensor-details"></div>
   </main>
 
-  <footer id="stamp">Updating&hellip;</footer>
+  <footer id="stamp" class="site-footer">Updating&hellip;</footer>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Map logic (ES‑module) -->
+  <!-- Map logic (ES module) -->
   <script type="module" src="js/map.js"></script>
 
   <!-- Timestamp fetcher -->
@@ -68,7 +72,7 @@
       });
   </script>
 
-  <!-- hamburger toggle script -->
+  <!-- Hamburger toggle -->
   <script src="js/menu.js" defer></script>
 </body>
 </html>
