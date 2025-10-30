@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>CCAS Dashboard – Interactive Map</title>
 
   <!-- Leaflet core CSS -->
@@ -14,7 +11,7 @@
   <!-- Unified site stylesheet -->
   <link rel="stylesheet" href="css/style.css?v=20251029" />
 
-  <!-- Minimal page-specific styles -->
+  <!-- Minimal page-specific styles (no header/nav styles) -->
   <style>
     /* Make the map fill the remaining viewport; remove default main padding here */
     main.map-page { padding: 0; display: flex; flex-direction: column; }
@@ -36,13 +33,12 @@
     </button>
     <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
-      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="map.html" aria-current="page">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
       <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
-
 
   <main id="main" class="map-page">
     <div id="map"></div>

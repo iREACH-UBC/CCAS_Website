@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>CCAS Dashboard – Sensor List</title>
 
-  <!-- Shared stylesheet -->
+  <!-- Unified stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Minimal fallback if style.css fails -->
+  <!-- Minimal fallback if style.css fails (no header/nav styles) -->
   <style>
   /* ─── Root palette & simple layout ───────────────────────────── */
   :root{
@@ -25,22 +25,6 @@
   }
 
   main{flex:1;padding:1rem;max-width:900px;margin:auto;box-sizing:border-box;}
-
-  /* ─── Header & nav ───────────────────────────────────────────── */
-  .site-header{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
-               padding:.6rem 1rem;background:var(--brand);color:var(--text);}
-  .logo{flex:1;font-size:1.2rem;font-weight:600;color:var(--text);text-decoration:none;}
-  .hamburger{display:none;background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;}
-  .nav{display:flex;gap:.6rem;flex-wrap:wrap;width:100%;}
-  .nav-button{color:var(--text);text-decoration:none;padding:.5rem 1rem;border-radius:var(--radius);
-              background:rgba(255,255,255,.15);}
-
-  /* Mobile ≤ 640 px: hide nav until burger tapped */
-  @media(max-width:640px){
-    .hamburger{display:inline-block;}
-    #site-nav{display:none;flex-direction:column;width:100%;margin-top:.5rem;}
-    #site-nav.open{display:flex;}
-  }
 
   /* ─── Sensor table ───────────────────────────────────────────── */
   #sensor-table{width:100%;border-collapse:collapse;font-size:0.95rem;}
@@ -89,7 +73,7 @@
 </head>
 
 <body>
-  <a class="visually-hidden skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
     <a href="index.html" class="logo">CCAS Dashboard</a>

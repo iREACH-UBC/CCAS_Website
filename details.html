@@ -8,7 +8,7 @@
   <!-- Shared stylesheet -->
   <link rel="stylesheet" href="css/style.css?v=20251029" />
 
-  <!-- Minimal fallback to keep layout readable if css/style.css is missing -->
+  <!-- Minimal fallback to keep layout readable if css/style.css is missing (no header/nav styles) -->
   <style>
     :root{--brand:#004b8d;--text:#fff;--radius:6px;}
     body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
@@ -46,7 +46,7 @@
     <nav id="site-nav" class="nav">
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
-      <a class="nav-button" href="details.html">Graphs</a>
+      <a class="nav-button" href="details.html" aria-current="page">Graphs</a>
       <a class="nav-button" href="list.html">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
