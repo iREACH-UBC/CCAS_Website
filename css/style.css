@@ -37,7 +37,9 @@ img{max-width:100%;height:auto;display:block;}
   .nav-button, .hamburger, .card { transition: none; }
   .nav-button:hover,
   .nav-button:focus,
-  .nav-button:focus-visible { transform: none; }  /* no lift on focus/hover */
+  .nav-button:focus-visible,
+  .card:hover,
+  .card:focus { transform: none; }                /* no lift on focus/hover */
 }
 
 /* 3️⃣ Header & navigation (HOME-PAGE STYLE, shared) */
@@ -53,15 +55,21 @@ img{max-width:100%;height:auto;display:block;}
 
 .logo{
   margin:0; flex:1;
-  /* keep the larger unified size, you can downshift if you prefer */
   font-size: clamp(1.35rem, 1rem + 1.2vw, 2rem);
   font-weight:700; color:var(--text); text-decoration:none;
 }
 
 .hamburger{
-  background: rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.25);
-  font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem); 
-  color:var(--text); cursor:pointer; line-height:1; display:none;
+  background: rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.25); /* lighter border for contrast */
+  font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem);
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1;
+  display: none;
+  padding: .25rem .5rem;             /* improved hit target */
+  min-width: 44px; min-height: 44px; /* a11y touch size */
+  border-radius: var(--radius);
 }
 
 .nav{
@@ -78,11 +86,16 @@ img{max-width:100%;height:auto;display:block;}
   transition: background-color .15s, transform .15s;
 }
 
-/* Match home page: hover + ANY focus, allow UA focus ring to show */
+/* Hover + ANY focus (allow native UA focus ring) */
 .nav-button:hover,
 .nav-button:focus{
   background-color: rgba(255,255,255,.30);
   transform: translateY(-2px);
+}
+
+/* Active page highlight */
+.nav-button[aria-current="page"]{
+  background-color: rgba(255,255,255,.30);
 }
 
 /* 📱 Mobile collapse — match home page */
@@ -115,7 +128,6 @@ img{max-width:100%;height:auto;display:block;}
 @media (max-width:640px){
   .nav-button{ width:100%; margin:0; text-align:center; padding:.75rem 1rem; }
 }
-
 
 /* 8️⃣  Tablet (≥641 px) */
 @media (min-width:641px){
