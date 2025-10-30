@@ -31,16 +31,19 @@ img{max-width:100%;height:auto;display:block;}
 .skip-link{position:absolute;left:-999px;top:auto;background:var(--brand);color:var(--text);padding:.5rem 1rem;z-index:100;}
 .skip-link:focus{left:0;}
 
-/* 3️⃣ Header & navigation (shared) */
-:root{
-  --header-pad-y: 1.1rem;
-  --header-pad-x: 1.6rem;
-  --radius: 6px;
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce){
+  html { scroll-behavior: auto; }                 /* disable smooth scroll */
+  .nav-button, .hamburger, .card { transition: none; }
+  .nav-button:hover,
+  .nav-button:focus,
+  .nav-button:focus-visible { transform: none; }  /* no lift on focus/hover */
 }
 
+/* 3️⃣ Header & navigation (HOME-PAGE STYLE, shared) */
 .site-header{
   display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-  /* fallbacks + safe-area insets */
+  /* keep your sizing + safe-area padding */
   padding-block: var(--header-pad-y, 1.1rem);
   padding-inline: calc(var(--header-pad-x, 1.6rem) + env(safe-area-inset-left))
                   calc(var(--header-pad-x, 1.6rem) + env(safe-area-inset-right));
@@ -51,60 +54,44 @@ img{max-width:100%;height:auto;display:block;}
 
 .logo{
   margin:0; flex:1;
+  /* keep the larger unified size, you can downshift if you prefer */
   font-size: clamp(1.35rem, 1rem + 1.2vw, 2rem);
   font-weight:700; color:var(--text); text-decoration:none;
 }
 
 .hamburger{
   background:none; border:none;
-  font-size: clamp(1.8rem, 1.2rem + 1.6vw, 2.2rem);
+  font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem); /* close to home page */
   color:var(--text); cursor:pointer; line-height:1; display:none;
 }
 
 .nav{
-  display:flex; gap:.8rem; margin-left:auto; flex-wrap:wrap; width:auto;
+  display:flex; gap:.6rem; margin-left:auto; flex-wrap:wrap; width:auto;
 }
 
 .nav-button{
   display:inline-block;
-  padding:.7rem 1.1rem;
+  padding:.5rem 1rem;                        /* home-page padding */
   font-size: clamp(1rem, .9rem + .45vw, 1.2rem);
   color:var(--text);
-  background-color: transparent;  /* use background-color for smooth transition */
-  text-decoration:none; border-radius:var(--radius);
+  background-color: rgba(255,255,255,.15);   /* filled pill by default */
+  text-decoration:none; border-radius: var(--radius);
   transition: background-color .15s, transform .15s;
 }
 
+/* Match home page: hover + ANY focus, allow UA focus ring to show */
 .nav-button:hover,
-.nav-button:focus-visible{
-  background-color: rgba(255,255,255,.15);
+.nav-button:focus{
+  background-color: rgba(255,255,255,.30);
   transform: translateY(-2px);
 }
 
-/* clear, visible focus for keyboard users */
-.hamburger:focus-visible,
-.nav-button:focus-visible,
-.logo:focus-visible{
-  outline: 2px solid rgba(255,255,255,.9);
-  outline-offset: 2px;
-  border-radius: var(--radius);
-}
-
-/* 📱 Mobile collapse */
+/* 📱 Mobile collapse — match home page */
 @media (max-width:640px){
   .hamburger{ display:inline-block; }
-  .nav{
-    display:none; flex-direction:column; gap:.4rem;
-    width:100%; margin-left:0;
-  }
+  .nav{ display:none; flex-direction:column; gap:.4rem; width:100%; margin-left:0; }
   .nav.open{ display:flex; }
-  /* keep the logo reasonably large on mobile */
-  .logo{ font-size: clamp(1.2rem, 1rem + 1vw, 1.6rem); }
-}
-
-/* Respect reduced-motion preferences */
-@media (prefers-reduced-motion: reduce){
-  .nav-button{ transition:none; }
+  .logo{ font-size:1rem; }                   /* home page’s smaller logo on mobile */
 }
 
 /* 4️⃣  Cards grid (home page) */
@@ -127,12 +114,9 @@ img{max-width:100%;height:auto;display:block;}
 
 /* 7️⃣  Small-screen (≤640 px) */
 @media (max-width:640px){
-  .hamburger{display:inline-block;}
-  .nav{display:none;flex-direction:column;gap:.4rem;width:100%;margin-left:0;}
-  .nav.open{display:flex !important;}      /* always override ‘none’ */
-  .logo{font-size:1rem;flex:1;}
-  .nav-button{width:100%;margin:0;text-align:center;padding:.75rem 1rem;}
+  .nav-button{ width:100%; margin:0; text-align:center; padding:.75rem 1rem; }
 }
+
 
 /* 8️⃣  Tablet (≥641 px) */
 @media (min-width:641px){
