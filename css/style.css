@@ -60,7 +60,7 @@ img{max-width:100%;height:auto;display:block;}
 }
 
 .hamburger{
-  background:none; border:none;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.24);
   font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2rem); /* close to home page */
   color:var(--text); cursor:pointer; line-height:1; display:none;
 }
