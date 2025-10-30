@@ -32,7 +32,7 @@ img{max-width:100%;height:auto;display:block;}
 /* 3️⃣  Header & navigation */
 .site-header{
   display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
-  padding:.6rem 1rem;background:var(--brand);color:var(--text);
+  padding:.10rem 1.5rem;background:var(--brand);color:var(--text);
   position:sticky;top:0;z-index:50;width:100%;
 }
 .logo{margin:0;font-size:1.25rem;font-weight:600;color:var(--text);text-decoration:none;}
