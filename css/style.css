@@ -10,6 +10,8 @@
   --bg:       #f5f7fa;
   --card-bg:  #e6f1ff;
   --radius:   6px;
+  --header-pad-y: clamp(.9rem, 1.2vw + .7rem, 1.3rem);
+  --header-pad-x: clamp(1rem, 2vw, 1.6rem);
 }
 
 /* 1️⃣  Resets & global layout */
@@ -32,22 +34,38 @@ img{max-width:100%;height:auto;display:block;}
 /* 3️⃣  Header & navigation */
 .site-header{
   display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
-  padding:.10rem 1.5rem;background:var(--brand);color:var(--text);
+  padding: var(--header-pad-y) var(--header-pad-x);
+  background:var(--brand);color:var(--text);
   position:sticky;top:0;z-index:50;width:100%;
+  min-height: clamp(60px, 7vh, 88px); /* thicker band */
 }
-.logo{margin:0;font-size:1.25rem;font-weight:600;color:var(--text);text-decoration:none;}
-.logo:hover,.logo:focus{text-decoration:none;}
+.logo{
+  margin:0;
+  font-size: clamp(1.35rem, 1rem + 1.2vw, 2rem); /* larger logo */
+  font-weight:700;
+  color:var(--text);
+  text-decoration:none;
+}
 
-.hamburger{background:none;border:none;font-size:1.6rem;color:var(--text);cursor:pointer;line-height:1;display:none;}
+.hamburger{
+  background:none;border:none;
+  font-size: clamp(1.8rem, 1.2rem + 1.6vw, 2.2rem); /* bigger icon */
+  color:var(--text);cursor:pointer;line-height:1;display:none;
+}
 
-.nav{display:flex;gap:.6rem;margin-left:auto;flex-wrap:wrap;width:auto;}
+.nav{display:flex;gap:.8rem;margin-left:auto;flex-wrap:wrap;width:auto;}
 
 .nav-button{
-  display:inline-block;padding:.5rem 1rem;color:var(--text);
+  display:inline-block;
+  padding:.7rem 1.1rem;               /* taller buttons */
+  font-size: clamp(1rem, .9rem + .45vw, 1.2rem); /* larger text */
+  color:var(--text);
   background:none;text-decoration:none;border-radius:var(--radius);
   transition:background-color .15s,transform .15s;
 }
-.nav-button:hover,.nav-button:focus{background:rgba(255,255,255,.15);transform:translateY(-2px);}
+.nav-button:hover,.nav-button:focus{
+  background:rgba(255,255,255,.15);transform:translateY(-2px);
+}
 
 /* 4️⃣  Cards grid (home page) */
 .cards{display:grid;gap:1rem;padding:2rem 1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
