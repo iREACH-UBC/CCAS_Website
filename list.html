@@ -61,10 +61,10 @@
     #sensor-table th[data-key="primary"],
     #sensor-table td:nth-child(2),
     #sensor-table td:nth-child(4){
-      white-space:normal;          /* allow wrapping               */
-      word-break:keep-all;         /* keep whole words together    */
-      overflow-wrap:break-word;    /* last-resort for super-long   */
-      hyphens:auto;                /* smart hyphenation if needed  */
+      white-space:normal;
+      word-break:keep-all;
+      overflow-wrap:break-word;
+      hyphens:auto;
     }
 
     /* Let “Last Seen” header wrap to two lines */
@@ -75,7 +75,16 @@
     /* slightly smaller header text to fit two-line labels */
     #sensor-table thead th{font-size:0.8rem;line-height:1.25;}
   }
-</style>
+
+  /* ♿ Reduced motion (site-wide override) */
+  @media (prefers-reduced-motion: reduce){
+    html { scroll-behavior: auto; }                /* disable smooth scroll from style.css */
+    .nav-button, .hamburger, .card { transition: none; }
+    .nav-button:hover,
+    .nav-button:focus,
+    .nav-button:focus-visible { transform: none; } /* no lift on focus/hover */
+  }
+  </style>
 
 </head>
 
@@ -93,7 +102,7 @@
       <a class="nav-button" href="index.html">Home</a>
       <a class="nav-button" href="map.html">Map</a>
       <a class="nav-button" href="details.html">Graphs</a>
-      <a class="nav-button" href="list.html">Sensors</a>
+      <a class="nav-button" href="list.html" aria-current="page">Sensors</a>
       <a class="nav-button" href="info.html">Info</a>
     </nav>
   </header>
