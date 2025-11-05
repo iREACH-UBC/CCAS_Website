@@ -28,6 +28,30 @@ function getAQHIColor(aqhi) {
   return '#8b2328';
 }
 
+/* ── Legend: fixed AQHI colour scale (1–10+) ───────────────────────── */
+const legend = L.control({ position: 'bottomright' });
+
+legend.onAdd = function () {
+  const div = L.DomUtil.create('div', 'aqhi-legend');
+  const grades = [1,2,3,4,5,6,7,8,9,10.5];   // 10.5 → use "10+" colour
+  const labels = ['1','2','3','4','5','6','7','8','9','10+'];
+
+  const swatches = grades
+    .map(g => `<span class="swatch" style="background:${getAQHIColor(g)}"></span>`)
+    .join('');
+
+  div.innerHTML = `
+    <h4>AQHI</h4>
+    <div class="swatches">${swatches}</div>
+    <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
+    <div class="cats"><span>Low</span><span>Moderate</span><span>High</span><span>Very High</span></div>
+  `;
+  return div;
+};
+
+legend.addTo(map);
+
+
 /* ── 3.  Fetch JSON once and add markers ──────────────────────────── */
 getSensorData().then(({ sensors, generated_at }) => {
   sensors.forEach(sensor => {
