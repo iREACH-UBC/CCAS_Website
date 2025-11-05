@@ -13,6 +13,10 @@
     /* Constrain and center the article content on this page only */
     main.info { padding: 1rem; max-width: 900px; margin: auto; line-height: 1.7; }
     main.info h2 { margin-top: 2rem; }
+
+    /* Optional: nicer spacing for collapsibles on the Info page */
+    main.info details { margin-top: .5rem; }
+    main.info details > summary { cursor: pointer; }
   </style>
 </head>
 
@@ -38,54 +42,78 @@
   <main id="main" class="info">
     <h2>About the Community Clean Air Spaces Dashboard</h2>
     <p>
-      This dashboard provides near-real-time air quality information for the
-      Vancouver Coastal Health region. It uses low-cost AQ sensors deployed across
-      the Vancouver Coastal Health Authority region to provide hyperlocal data.
+      This dashboard provides near-real-time air quality information for the Vancouver Coastal Health region.
+      It uses low-cost air-quality sensors deployed across the Vancouver Coastal Health Authority to provide hyperlocal data.
     </p>
 
-    <!-- Replaced/expanded section with anchors used by the legend link -->
+    <!-- Anchored section used by the map legend's "What's this?" link -->
     <section id="aqhi" aria-labelledby="aqhi-title">
       <h2 id="aqhi-title">What is the Air Quality Health Index (AQHI+)?</h2>
 
       <p>
-        The <abbr title="Air Quality Health Index">AQHI</abbr> is a scale that helps you understand how the air around you can affect your health.
-        It is a tool meant to guide you in making choices to protect yourself, such as spending less time outside or changing your activities when air pollution levels are high. It ranges from 1 to 10+, with 1 being the best air quality. The Province of British Columbia recommends the use of the AQHI+ (AQHI-Plus). This index is very similar to the older AQHI, but is better-suited to environments that have high particulate matter, such as those affected by wildfires.
+        The <abbr title="Air Quality Health Index">AQHI</abbr> is a 1–10+ scale indicating how air pollution may affect your health.
+        British Columbia recommends the use of <strong>AQHI+</strong> (AQHI-Plus), which is very similar to the older AQHI but
+        better suited to conditions with high particulate matter (e.g., wildfire smoke).
       </p>
 
       <p>
-        The AQHI+ is especially important for people who are more sensitive to air pollution, offering advice for times when the air poses
-        <strong>low</strong>, <strong>moderate</strong>, <strong>high</strong>, or <strong>very high</strong> health risks.
+        AQHI+ helps you make choices to protect yourself—such as reducing time outdoors or changing activities—especially if you are more
+        sensitive to air pollution. Risk categories are grouped as
+        <strong>Low (1–3)</strong>, <strong>Moderate (4–6)</strong>, <strong>High (7–9)</strong>, and <strong>Very High (10+)</strong>.
       </p>
 
       <p>
-        See the Appendix for more details on
-        <a href="#how-is-the-aqhi-calculated">how the AQHI is calculated</a>
-        and the
-        <a href="#what-is-the-scale-for-the-aqhi">AQHI scale</a>.
+        The data collected by our sensors is used to calculate the outdoor AQHI+. Learn more below:
+        <a href="#what-is-the-scale-for-the-aqhi">AQHI scale</a> and
+        <a href="#how-is-the-aqhi-calculated">how the index is calculated</a>.
       </p>
 
-      <p>
-        The data collected by our sensors is used to calculate the outdoor AQHI+
-      </p>
+      <!-- Compact, collapsible appendix content -->
+      <details id="what-is-the-scale-for-the-aqhi">
+        <summary><strong>AQHI scale (1–10+)</strong></summary>
+        <p>The AQHI/AQHI+ scale ranges from 1–10+, grouped into health-risk categories:</p>
+        <ul>
+          <li><strong>1–3:</strong> Low health risk</li>
+          <li><strong>4–6:</strong> Moderate health risk</li>
+          <li><strong>7–9:</strong> High health risk</li>
+          <li><strong>10+:</strong> Very high health risk</li>
+        </ul>
+      </details>
+
+      <details id="how-is-the-aqhi-calculated">
+        <summary><strong>How is the AQHI calculated?</strong></summary>
+        <p>In British Columbia, two calculations are made and the higher value is reported:</p>
+        <ol>
+          <li>
+            A combined health-risk calculation using three pollutants:
+            <ol type="a">
+              <li>Ozone (O<sub>3</sub>) at ground level,</li>
+              <li>Fine Particulate Matter (PM<sub>2.5</sub>), and</li>
+              <li>Nitrogen Dioxide (NO<sub>2</sub>).</li>
+            </ol>
+          </li>
+          <li>Fine Particulate Matter (PM<sub>2.5</sub>) concentration alone.</li>
+        </ol>
+      </details>
     </section>
 
     <h2>How to Read the Dashboard</h2>
     <ul>
-      <li><strong>Map:</strong> Colour-coded markers show current AQHI. Click a marker to see details for that sensor.</li>
-      <li><strong>Graphs:</strong> Select a sensor and pollutant to see data for the past 24 hours.</li>
-      <li><strong>Sensor List:</strong> Table view of all active sensors showing current pollutant concentrations.</li>
+      <li><strong>Map:</strong> Colour-coded markers show the current AQHI+. Click a marker to see details for that sensor.</li>
+      <li><strong>Graphs:</strong> Select a sensor and pollutant to view the past 24 hours.</li>
+      <li><strong>Sensor List:</strong> A table of active sensors with current pollutant concentrations.</li>
     </ul>
 
     <h2>Data Sources &amp; Methods</h2>
     <p>
-      Sensor data is updated from community monitors maintained by the University of British Columbia, and calibrated using
+      Sensor data is updated from community monitors maintained by the University of British Columbia and calibrated using
       algorithms developed by the research team specifically for these deployments.
     </p>
 
     <h2>Limitations</h2>
     <p>
-      Low-cost sensors can drift and may be affected by humidity, temperature, and cross-sensitivities. While calibration
-      reduces these errors, always follow local guidance, including official air quality statements.
+      Low-cost sensors can drift and may be affected by humidity, temperature, and cross-sensitivities. While calibration reduces these errors,
+      always follow local guidance, including official air-quality statements.
     </p>
 
     <h2>Contact &amp; Feedback</h2>
@@ -93,41 +121,6 @@
       Questions or suggestions? Email the team at
       <a href="mailto:HelloAirQuality@mech.ubc.ca">HelloAirQuality@mech.ubc.ca</a>.
     </p>
-
-    <!-- Appendix anchors referenced above (minimal placeholders; expand as needed) -->
-    <section aria-labelledby="appendix-title">
-      <h2 id="appendix-title">Appendix</h2>
-
-      <h3 id="how-is-the-aqhi-calculated">How is the AQHI calculated?</h3>
-      <p>
-        In British Columbia, the AQHI is calculated in two different ways, and the higher of the two
-        values is reported:
-      </p>
-      <ol>
-        <li>
-          A combined health-risk calculation using three common air pollutants:
-          <ol type="a">
-            <li>Ozone (O<sub>3</sub>) at ground level,</li>
-            <li>Fine Particulate Matter (PM<sub>2.5</sub>), and</li>
-            <li>Nitrogen Dioxide (NO<sub>2</sub>).</li>
-          </ol>
-        </li>
-        <li>Fine Particulate Matter (PM<sub>2.5</sub>) concentration alone.</li>
-      </ol>
-      
-      <h3 id="what-is-the-scale-for-the-aqhi">What is the scale for the AQHI?</h3>
-      <p>
-        The AQHI is measured on a scale ranging from 1–10+. Index values are grouped into health-risk
-        categories:
-      </p>
-      <ul>
-        <li><strong>1–3:</strong> Low health risk</li>
-        <li><strong>4–6:</strong> Moderate health risk</li>
-        <li><strong>7–9:</strong> High health risk</li>
-        <li><strong>10+:</strong> Very high health risk</li>
-      </ul>
-
-    </section>
   </main>
 
   <footer class="site-footer">
