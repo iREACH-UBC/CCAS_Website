@@ -12,6 +12,7 @@
   --radius:   6px;
   --header-pad-y: clamp(.9rem, 1.2vw + .7rem, 1.3rem);
   --header-pad-x: clamp(1rem, 2vw, 1.6rem);
+  --header-offset: clamp(60px, 7vh, 88px);
 }
 
 /* 1️⃣  Resets & global layout */
@@ -137,4 +138,12 @@ img{max-width:100%;height:auto;display:block;}
 /* 9️⃣  Desktop (≥1024 px) */
 @media (min-width:1024px){
   main{padding:2rem 3rem;}
+}
+
+main h1[id],
+main h2[id],
+main h3[id],
+main section[id],
+main details[id]{
+  scroll-margin-top: calc(var(--header-offset) + 8px);
 }
