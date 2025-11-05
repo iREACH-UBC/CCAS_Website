@@ -41,10 +41,15 @@ legend.onAdd = function () {
     .join('');
 
   div.innerHTML = `
-    <h4>AQHI</h4>
+    <h4>AQHI+</h4>
     <div class="swatches">${swatches}</div>
     <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
-    <div class="cats"><span>Low</span><span>Moderate</span><span>High</span><span>Very High</span></div>
+    <div class="bands" aria-label="AQHI risk categories">
+      <span class="low">Low (1–3)</span>
+      <span class="moderate">Moderate (4–6)</span>
+      <span class="high">High (7–9)</span>
+      <span class="vhigh">Very High (10+)</span>
+    </div>
   `;
   return div;
 };
