@@ -17,8 +17,59 @@
     /* Optional: nicer spacing for collapsibles on the Info page */
     main.info details { margin-top: .5rem; }
     main.info details > summary { cursor: pointer; }
+    
+    /* Smooth in-page scrolling (optional but nice) */
+    html { scroll-behavior: smooth; }
+    
+    /* Header height → used for anchor offset */
+    :root { --header-offset: 64px; } /* default; JS below will auto-measure */
+    
+    /* Make anchored elements stop *below* the sticky header */
+    main.info h2[id],
+    main.info h3[id],
+    main.info section[id],
+    main.info details[id]{
+      scroll-margin-top: calc(var(--header-offset) + 8px);
+    }
+
   </style>
 </head>
+<script>
+  (function () {
+    const header = document.querySelector('.site-header');
+
+    function setOffsetVar() {
+      const h = header ? header.offsetHeight : 0;
+      document.documentElement.style.setProperty('--header-offset', h + 'px');
+    }
+
+    function openDetailsAndAlign(hash) {
+      if (!hash) return;
+      const id = hash.replace(/^#/, '');
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // If the target lives inside a <details>, open it first
+      const d = el.closest('details');
+      if (d && !d.open) d.open = true;
+
+      // After opening, re-scroll to apply scroll-margin-top
+      requestAnimationFrame(() => el.scrollIntoView({ block: 'start' }));
+    }
+
+    // Initial setup
+    setOffsetVar();
+
+    // Recompute on resize (header height can change on mobile)
+    window.addEventListener('resize', setOffsetVar);
+
+    // Handle initial URL with hash
+    if (location.hash) openDetailsAndAlign(location.hash);
+
+    // Handle in-page anchor clicks / hash changes
+    window.addEventListener('hashchange', () => openDetailsAndAlign(location.hash));
+  })();
+</script>
 
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
