@@ -40,16 +40,23 @@ legend.onAdd = function () {
     .map(g => `<span class="swatch" style="background:${getAQHIColor(g)}"></span>`)
     .join('');
 
-  div.innerHTML = `
-    <h4>AQHI+</h4>
-    <div class="swatches">${swatches}</div>
-    <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
-    <div class="bands" aria-label="AQHI risk categories">
-      <span class="low">Low (1–3)</span>
-      <span class="moderate">Moderate (4–6)</span>
-      <span class="high">High (7–9)</span>
-      <span class="vhigh">Very High (10+)</span>
-    </div>
+    div.innerHTML = `
+      <h4 class="legend-title">
+        <span>AQHI</span>
+        <a class="legend-help"
+           href="info.html#aqhi"
+           aria-label="What is this colour scale? Learn more on the Info page.">
+           What’s this?
+        </a>
+      </h4>
+      <div class="swatches">${swatches}</div>
+      <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
+      <div class="bands" aria-label="AQHI risk categories">
+        <span class="low">Low (1–3)</span>
+        <span class="moderate">Moderate (4–6)</span>
+        <span class="high">High (7–9)</span>
+        <span class="vhigh">Very High (10+)</span>
+      </div>
   `;
   return div;
 };
