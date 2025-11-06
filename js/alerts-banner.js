@@ -15,7 +15,7 @@ export async function mountAqAlertBanner () {
 
   const label = locations.length <= 3
     ? locations.join(', ')
-    : `${locations.slice(0, 3).join(', ')} and ${locations.length - 3} more`;
+    : `${locations.slice(0, 3).join('; ')} and ${locations.length - 3} more`;
 
   const banner = document.createElement('div');
   banner.id = 'aq-alert-banner';
