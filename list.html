@@ -44,7 +44,6 @@
 
     /* slightly smaller header text to fit two-line labels */
     #sensor-table thead th{font-size:0.8rem;line-height:1.25;}
-  }
 
   /* ♿ Reduced motion (site-wide override) */
   @media (prefers-reduced-motion: reduce){
@@ -80,7 +79,7 @@
   <main id="main">
     <!-- horizontal scroll wrapper prevents “smush” on tiny screens -->
     <div class="table-scale-wrap">
-      <table id="sensor-table">
+      <table id="sensor-table" class="scale-target">
         <thead>
           <tr>
             <th data-key="name">Name ▲</th>
