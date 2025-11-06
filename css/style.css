@@ -133,7 +133,7 @@ img{max-width:100%;height:auto;display:block;}
 
   /* use the per-card var */
   background: #0d2238 center/cover no-repeat;  /* fallback color */
-  background-image: var(--bg, none);
+  background-image: var(--card-image, none);
 
   /* readable text over photos */
   color: var(--card-color, #fff);

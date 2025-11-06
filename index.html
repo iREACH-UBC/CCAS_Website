@@ -6,29 +6,20 @@
   <title>CCAS Dashboard</title>
 
   <!-- Unified stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20251105">
 
   <!-- Minimal page-specific fallback (no header/nav styles) -->
   <style>
     :root{--brand:#004b8d;--text:#fff;--card-bg:#e6f1ff;--radius:6px;}
-
-    /* layout */
     body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;background:#f5f7fa;}
     main{flex:1;padding:1rem;}
-
-    /* a11y helpers (safe to keep as fallback) */
     .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
     .skip-link{position:absolute;left:-999px;top:auto;background:var(--brand);color:var(--text);padding:.5rem 1rem;z-index:100;}
     .skip-link:focus{left:0;}
-
-    /* cards grid */
     .cards{display:grid;gap:1rem;padding:2rem 1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-    .card{color:var(--brand);text-decoration:none;font-size:1.25rem;padding:2rem 1rem;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;transition:transform .18s;}
-    .card:hover,.card:focus{transform:translateY(-3px);}  
-
-    /* footer */
     .site-footer{text-align:center;padding:1rem 0;font-size:.9rem;color:#666;}
   </style>
+
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -54,25 +45,24 @@
 
     <section class="cards">
       <a class="card" href="map.html"
-         style="--bg: url('assets/cards/map.png'); --card-color:#fff;">
+         style="--card-image: url('assets/cards/map.png'); --card-color:#fff;">
         <span>Interactive&nbsp;Map</span>
       </a>
     
       <a class="card" href="details.html"
-         style="--bg: url('assets/cards/graphs.png'); --card-color:#fff;">
+         style="--card-image: url('assets/cards/graphs.png'); --card-color:#fff;">
         <span>Graphs</span>
       </a>
     
       <a class="card" href="list.html"
-         style="--bg: url('assets/cards/list.png'); --card-color:#fff;">
+         style="--card-image: url('assets/cards/list.png'); --card-color:#fff;">
         <span>Sensor&nbsp;List</span>
       </a>
     
       <a class="card" href="info.html"
-         style="--bg: url('assets/cards/info.png'); --card-color:#fff;">
+         style="--card-image: url('assets/cards/info.png'); --card-color:#fff;">
         <span>Info&nbsp;&amp;&nbsp;Resources</span>
       </a>
-
     </section>
 
   </main>
