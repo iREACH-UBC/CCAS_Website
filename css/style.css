@@ -162,6 +162,12 @@ img{max-width:100%;height:auto;display:block;}
 .card:hover,.card:focus{ transform: translateY(-3px); }
 .card:focus-visible{ outline:3px solid #fff; outline-offset:2px; }
 
+.card--map    { --card-image: url('assets/cards/map.png');    --card-color: #fff; }
+.card--graphs { --card-image: url('assets/cards/graphs.png'); --card-color: #fff; }
+.card--list   { --card-image: url('assets/cards/list.png');   --card-color: #fff; }
+.card--info   { --card-image: url('assets/cards/info.png');   --card-color: #fff; }
+
+
 /* 5️⃣  Detail cell + pollutant mini-table */
 .detail-cell{background:#eef6ff;padding:.8rem 1rem;font-size:.95rem;}
 .poll-table{width:100%;border-collapse:collapse;margin-top:.6rem;}
