@@ -108,13 +108,68 @@ img{max-width:100%;height:auto;display:block;}
 }
 
 /* 4️⃣  Cards grid (home page) */
-.cards{display:grid;gap:1rem;padding:2rem 1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-.card{
-  background:var(--card-bg);color:var(--brand);text-decoration:none;font-size:1.25rem;
-  padding:2rem 1rem;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.1);
-  display:flex;align-items:center;justify-content:center;transition:transform .18s;
+.cards{
+  display:grid;
+  gap:1rem;
+  padding:2rem 1rem;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 }
-.card:hover,.card:focus{transform:translateY(-3px);}
+
+/* Photo cards with overlay + label chip */
+.card{
+  position:relative;
+  display:grid;
+  place-items:end start;           /* put text bottom-left */
+  aspect-ratio:16/9;               /* tidy tile shape */
+  min-height:9rem;                 /* fallback */
+  padding:1rem;
+  border-radius:10px;
+  overflow:hidden;
+  text-decoration:none;
+  font-size:1.15rem;
+  font-weight:700;
+  letter-spacing:.2px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+  transition:transform .18s;
+
+  /* background image via CSS var, with solid fallback */
+  background: #0d2238 center/cover no-repeat; /* fallback */
+  background-image: var(--bg, none);
+
+  /* text color: falls back to brand if no --card-color set */
+  color: var(--card-color, var(--brand));
+}
+
+/* Gradient overlay for readability */
+.card::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.08) 10%, rgba(0,0,0,.55) 100%);
+  opacity: var(--overlay, 1);
+  pointer-events:none;
+  transition:opacity .2s ease;
+}
+
+/* Label chip for extra contrast over busy photos */
+.card > span{
+  position:relative; z-index:1;
+  background: rgba(0,0,0,.35);
+  padding:.4rem .6rem;
+  border-radius:.5rem;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  color: inherit;                  /* respects --card-color */
+}
+
+/* Hover / focus */
+.card:hover,
+.card:focus { transform: translateY(-3px); }
+.card:focus-visible{
+  outline:3px solid #fff;
+  outline-offset:2px;
+}
+
 
 /* 5️⃣  Detail cell + pollutant mini-table */
 .detail-cell{background:#eef6ff;padding:.8rem 1rem;font-size:.95rem;}
