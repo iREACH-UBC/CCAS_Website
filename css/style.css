@@ -170,22 +170,30 @@ img{max-width:100%;height:auto;display:block;}
 
 
 /* 5️⃣  Detail cell + pollutant mini-table */
-.detail-cell{background:#eef6ff;padding:.8rem 1rem;font-size:.95rem;}
-.poll-table{width:100%;border-collapse:collapse;margin-top:.6rem;}
-.poll-table th,.poll-table td{border:1px solid #d4e4ff;padding:.35rem .5rem;font-size:.9rem;text-align:left;}
-.poll-table th{background:#ddecff;font-weight:500;}
+.detail-cell{ background:#eef6ff; padding:.8rem 1rem; font-size:.95rem; }
+.poll-table{ width:100%; border-collapse:collapse; margin-top:.6rem; }
+.poll-table th,.poll-table td{
+  border:1px solid #d4e4ff; padding:.35rem .5rem; font-size:.9rem; text-align:left;
+}
+.poll-table th{ background:#ddecff; font-weight:500; }
+
 /* Fit-to-width scaler for wide, no-wrap tables */
 .table-scale-wrap{
   position: relative;
   width: 100%;
-  overflow: hidden;      /* hide overflow once scaled */
+  overflow: hidden;     /* hide overflow once scaled */
+  overflow-x: clip;     /* avoid horizontal scroll on modern browsers */
 }
 
 /* the table itself becomes the scale target */
 .table-scale-wrap .scale-target{
   transform-origin: top left;
+  will-change: transform;
+  display: inline-block; /* shrink to intrinsic width instead of 100% */
 }
 
+/* Fixed 33% shrink (i.e., scale = 0.67) */
+.shrink-33{ transform: scale(0.67); }
 
 @media print{
   .table-scale-wrap{ overflow: visible; height: auto !important; }
