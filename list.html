@@ -34,23 +34,9 @@
 
   /* numeric columns aligned right */
   #sensor-table th[data-key="aqhi"],
-  #sensor-table td:nth-child(3){
+  #sensor-table td:nth-child(2){
     text-align:right;font-variant-numeric:tabular-nums;
   }
-
-  /* ─── Small-screen tweaks ≤ 480 px ───────────────────────────── */
-  @media(max-width:480px){
-    /* Wrap long labels & values softly (break only at spaces / hyphenation) */
-    #sensor-table th[data-key="name"],
-    #sensor-table th[data-key="primary"],
-    #sensor-table td:nth-child(2),
-    #sensor-table td:nth-child(4){
-      white-space:normal;
-      word-break:keep-all;
-      overflow-wrap:break-word;
-      hyphens:auto;
-    }
-
     /* Let “Last Seen” header wrap to two lines */
     #sensor-table th[data-key="timestamp"]{
       white-space:normal;
@@ -93,7 +79,7 @@
 
   <main id="main">
     <!-- horizontal scroll wrapper prevents “smush” on tiny screens -->
-    <div style="overflow-x:auto;">
+    <div class="table-scale-wrap">
       <table id="sensor-table">
         <thead>
           <tr>
@@ -130,5 +116,55 @@
 
   <!-- hamburger toggle -->
   <script src="js/menu.js" defer></script>
+  
+  <script>
+  (function(){
+    const wrap  = document.querySelector('.table-scale-wrap');
+    const table = document.getElementById('sensor-table');
+    if(!wrap || !table) return;
+  
+    const scaleTable = () => {
+      // measure unscaled
+      table.style.transform = 'none';
+      wrap.style.height = 'auto';
+  
+      const naturalW  = table.offsetWidth;
+      const naturalH  = table.offsetHeight;
+      const available = wrap.clientWidth || window.innerWidth;
+  
+      let scale = naturalW ? Math.min(1, available / naturalW) : 1;
+      // snap a bit to reduce blur
+      scale = Math.round(scale * 200) / 200;
+  
+      table.style.transform = scale === 1 ? 'none' : `scale(${scale})`;
+      wrap.style.height = (naturalH * scale) + 'px';
+    };
+  
+    // expose for manual calls
+    window.fitSensorTable = scaleTable;
+  
+    // container resizes
+    new ResizeObserver(scaleTable).observe(wrap);
+  
+    // fonts / load / orientation
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scaleTable);
+    window.addEventListener('orientationchange', scaleTable, {passive:true});
+    window.addEventListener('load', scaleTable);
+  
+    // content changes (rows added + expand/collapse)
+    const tbody = table.tBodies && table.tBodies[0];
+    if (tbody) {
+      new MutationObserver(scaleTable).observe(tbody, {
+        childList: true,
+        subtree: true,
+        attributes: true,       // 👈 catch display toggles
+        attributeFilter: ['style']
+      });
+    }
+  
+    scaleTable();
+  })();
+  </script>
+
 </body>
 </html>
