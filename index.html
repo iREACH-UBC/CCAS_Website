@@ -58,5 +58,12 @@
 
   <!-- Hamburger toggle script -->
   <script src="js/menu.js" defer></script>
+  
+  <!-- near the end of <body>, after your header markup -->
+  <script type="module">
+    import { mountAqAlertBanner } from './js/alerts-banner.js';
+    document.addEventListener('DOMContentLoaded', mountAqAlertBanner);
+  </script>
+
 </body>
 </html>
