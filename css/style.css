@@ -176,7 +176,7 @@ img{max-width:100%;height:auto;display:block;}
 .poll-table th{background:#ddecff;font-weight:500;}
 
 /* 6️⃣  Footer */
-.site-footer{text-align:center;padding:5rem 0;font-size:.5rem;color:#666;}
+.site-footer{text-align:center;padding:1rem 0;font-size:.9rem;color:#666;}
 
 /* 7️⃣  Small-screen (≤640 px) */
 @media (max-width:640px){
