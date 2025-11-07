@@ -2,6 +2,14 @@
 // + remembers last sensor / pollutant across reloads
 import { getSensorData } from './data.js';
 
+
+// Chart defaults
+Chart.defaults.font.family = 'system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+Chart.defaults.color = '#0b1f33';
+Chart.defaults.elements.line.borderCapStyle = 'round';
+Chart.defaults.elements.line.borderJoinStyle = 'round';
+Chart.defaults.elements.point.hitRadius = 12;
+
 /* ---------- Constants ---------------------------------------------------- */
 
 function bandColours () {
@@ -138,19 +146,38 @@ async function drawChart () {
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
 
+    // --- Beautify: gradient fill, gap-end dots, lighter grids, smarter tooltips ---
+  const grad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+  grad.addColorStop(0, 'rgba(0,75,141,0.22)');
+  grad.addColorStop(1, 'rgba(0,75,141,0)');
+
+  // Mark the ends of gaps with small dots
+  const gapEnds = new Set();
+  for (let i = 0; i < points.length; i++) {
+    const cur = points[i]?.y, next = points[i+1]?.y, prev = points[i-1]?.y;
+    if (cur != null && (next == null || prev == null)) gapEnds.add(i);
+  }
+
   chart = new Chart(ctx, {
     type: 'line',
-    data: { datasets: [{
-      label: pollutantSel.value,
-      data: points,
-      borderColor: '#004b8d',
-      borderWidth: 2,
-      pointRadius: 0,
-      spanGaps: false,
-      tension: 0.3
-    }]},
+    data: {
+      datasets: [{
+        label: pollutantSel.value,
+        data: points,
+        borderColor: '#004b8d',
+        backgroundColor: grad,
+        fill: true,
+        borderWidth: 2,
+        pointRadius: (ctx) => gapEnds.has(ctx.dataIndex) ? 2.5 : 0,
+        pointHoverRadius: 4,
+        spanGaps: false,
+        tension: 0.28
+      }]
+    },
     options: {
       responsive: true,
+      animation: { duration: 450, easing: 'easeOutQuart' },
+      layout: { padding: { top: 6 } },
       interaction: { mode: 'index', intersect: false },
       plugins: {
         title: {
@@ -160,25 +187,34 @@ async function drawChart () {
         },
         legend: { display: false },
         tooltip: {
+          displayColors: false,
           callbacks: {
-            label: (ctx) =>
-              `${ctx.dataset.label}: ${ctx.parsed.y ?? '—'} ${UNITS[pollutantSel.value]}`
+            title: (items) => {
+              const t = items[0]?.parsed?.x;
+              return t ? new Date(t).toLocaleString() : '';
+            },
+            label: (ctx) => {
+              const y = ctx.parsed.y;
+              const unit = UNITS[pollutantSel.value] || '';
+              if (y == null || !Number.isFinite(y)) return 'No data';
+              const digits = Math.abs(y) < 10 ? 2 : 1;
+              return `${ctx.dataset.label}: ${y.toLocaleString(undefined,{maximumFractionDigits:digits})} ${unit}`;
+            }
           }
-        }
-        // ,yBands: BANDS[pollutantSel.value]   // uncomment to re-enable AQHI bands
+        },
+        // Built-in decimation keeps it smooth with lots of points
+        decimation: { enabled: true, algorithm: 'lttb', samples: 300 }
       },
       scales: {
         x: {
           type: 'time',
           min: tMin,
           max: tMax,
-          time: {
-            unit: 'hour',
-            stepSize: 1,
-            displayFormats: { hour: 'HH' }
-          },
+          time: { unit: 'hour', stepSize: 1, displayFormats: { hour: 'HH' } },
+          grid: { color: 'rgba(0,0,0,.06)' },
           ticks: {
             autoSkip: false,
+            maxRotation: 0,
             callback (value) {
               const d = new Date(value);
               return d.getHours() === 0
@@ -191,12 +227,21 @@ async function drawChart () {
         y: {
           beginAtZero: true,
           suggestedMax: Math.max(...numeric.map(p => p.y)) * 1.1,
+          grid: { color: 'rgba(0,0,0,.06)' },
+          ticks: {
+            callback: (v) => {
+              // Round sensibly for readability
+              const digits = Math.abs(v) < 10 ? 1 : 0;
+              return Number(v).toLocaleString(undefined, { maximumFractionDigits: digits });
+            }
+          },
           title: { display: true, text: `${pollutantSel.value} (${UNITS[pollutantSel.value]})` }
         }
       }
     },
-    plugins: [crosshairPlugin]
+    plugins: [crosshairPlugin, yBandsPlugin, nowLinePlugin]
   });
+
 }
 
 /* ---------- Cross-hair plugin ------------------------------------------- */
@@ -217,3 +262,45 @@ const crosshairPlugin = {
     ctx.restore();
   }
 };
+
+// Background concentration bands (uses your BANDS table)
+const yBandsPlugin = {
+  id: 'yBands',
+  beforeDatasetsDraw(chart) {
+    const bands = BANDS[pollutantSel.value];
+    if (!bands) return;
+    const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+    const [a, b, c, d] = bands.limits;
+    const ranges = [[a,b],[b,c],[c,d]];
+    ctx.save();
+    ranges.forEach(([lo, hi], i) => {
+      const yTop = y.getPixelForValue(hi);
+      const yBot = y.getPixelForValue(lo);
+      const hTop = Math.max(top, Math.min(yTop, bottom));
+      const hBot = Math.max(top, Math.min(yBot, bottom));
+      ctx.fillStyle = bands.colors[i];
+      ctx.fillRect(left, Math.min(hTop, hBot), right - left, Math.abs(hBot - hTop));
+    });
+    ctx.restore();
+  }
+};
+
+// Faint “now” line
+const nowLinePlugin = {
+  id: 'nowLine',
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea, scales: { x } } = chart;
+    const now = Date.now();
+    if (now < x.min || now > x.max) return;
+    const xPos = x.getPixelForValue(now);
+    ctx.save();
+    ctx.setLineDash([2, 2]);
+    ctx.strokeStyle = 'rgba(0,0,0,.25)';
+    ctx.beginPath();
+    ctx.moveTo(xPos, chartArea.top);
+    ctx.lineTo(xPos, chartArea.bottom);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
