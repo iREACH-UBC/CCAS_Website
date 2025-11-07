@@ -24,7 +24,7 @@ const BANDS = {
   NO2:     { limits: [0, 53, 106, 400],  colors: bandColours() },
   NO:      { limits: [0, 53, 106, 400],  colors: bandColours() },
   CO:      { limits: [0, 4, 13, 50],     colors: bandColours() },
-  CO2:     { limits: [350, 800, 1200, 2000], colors: bandColours() }
+  CO2:     { limits: [0, 800, 1200, 2000], colors: bandColours() }
 };
 
 const UNITS = {
