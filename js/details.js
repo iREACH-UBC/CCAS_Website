@@ -316,7 +316,7 @@ const dayDividersPlugin = {
       ctx.lineTo(px, bottom);
       ctx.stroke();
       // label at the top, inside the chart area
-      ctx.fillText(fmt.format(d), px, bottom + 4);
+      ctx.fillText(fmt.format(d), px, bottom + 16);
     }
     ctx.restore();
   }
