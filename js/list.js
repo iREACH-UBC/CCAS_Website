@@ -1,4 +1,4 @@
-/* js/list.js – sortable, expandable sensor list (no ID column) */
+/* js/list.js – table on desktop, cards on mobile */
 import { getSensorData } from './data.js';
 
 /* ---------- helpers ------------------------------------------------- */
@@ -15,27 +15,36 @@ function colourForAQHI(a){
   if (a<=9)  return '#bf2733';
   return '#8b2328';
 }
-const fmt       =(x,d=2)=> x==null ? '—' : Number(x).toFixed(d);
-const aqhiBand  = v=> v==null ? '—' : v<=3 ? 'Low' : v<=6 ? 'Moderate'
-                                          : v<=10? 'High' : 'Very High';
+const fmt      =(x,d=2)=> x==null ? '—' : Number(x).toFixed(d);
+const aqhiBand = v=> v==null ? '—' : v<=3 ? 'Low' : v<=6 ? 'Moderate' : v<=10? 'High' : 'Very High';
+const fmtTS = (ts, withDate) => {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return withDate
+    ? d.toLocaleString(undefined,{ year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
+    : d.toLocaleTimeString(undefined,{ hour:'2-digit', minute:'2-digit', hour12:false });
+};
 
 /* pollutant meta for detail table */
 const META={
-  co  :{name:'CO',  unit:'ppm', info:'Carbon monoxide…',                       low:4,  med:13},
-  no  :{name:'NO',  unit:'ppb', info:'Nitric oxide – precursor to NO₂ & O₃.',  low:53, med:106},
-  no2 :{name:'NO₂', unit:'ppb', info:'Nitrogen dioxide irritates lungs.',      low:53, med:106},
-  o3  :{name:'O₃',  unit:'ppb', info:'Ozone can irritate the respiratory system.',low:33, med:66},
-  co2 :{name:'CO₂', unit:'ppm', info:'CO₂ – indoor IAQ proxy.',                low:800,med:1200},
-  pm25:{name:'PM₂.₅',unit:'µg/m³',info:'Fine particles penetrate deep lungs.', low:12, med:25}
+  co  :{name:'CO',    unit:'ppm',   info:'Carbon monoxide…',                       low:4,   med:13},
+  no  :{name:'NO',    unit:'ppb',   info:'Nitric oxide – precursor to NO₂ & O₃.',  low:53,  med:106},
+  no2 :{name:'NO₂',   unit:'ppb',   info:'Nitrogen dioxide irritates lungs.',      low:53,  med:106},
+  o3  :{name:'O₃',    unit:'ppb',   info:'Ozone can irritate the respiratory system.', low:33, med:66},
+  co2 :{name:'CO₂',   unit:'ppm',   info:'CO₂ – indoor IAQ proxy.',                low:800, med:1200},
+  pm25:{name:'PM₂.₅', unit:'µg/m³', info:'Fine particles penetrate deep lungs.',   low:12,  med:25}
 };
 
-/* ---------- table setup --------------------------------------------- */
-const tbody   = document.querySelector('#sensor-table tbody');
-const headers = document.querySelectorAll('#sensor-table th');
+const tbody      = document.querySelector('#sensor-table tbody');
+const headers    = document.querySelectorAll('#sensor-table th');
+const cardsWrap  = document.getElementById('sensor-cards');
+const tableWrap  = document.querySelector('.table-scale-wrap');
+const mqMobile   = window.matchMedia('(max-width: 640px)');
+const isMobile   = () => mqMobile.matches;
 
 let sensors = [];
-let sortKey = 'name';   // default sort now “Name”
-let sortDir = 1;        // 1 = asc, -1 = desc
+let sortKey = 'name';
+let sortDir = 1;
 
 function keyVal(s,key){
   switch (key){
@@ -47,16 +56,27 @@ function keyVal(s,key){
   }
 }
 
-/* build summary + detail rows (4-col table) */
-function buildRows(sensor){
+/* Try to attach a concentration to the declared primary pollutant */
+const norm = s => (s ?? '').toString().toLowerCase().replace(/[^a-z0-9]/g,'');
+function primaryReading(primaryLabel, pollutants){
+  if (!primaryLabel) return null;
+  let matchKey = null;
+  for (const [k, meta] of Object.entries(META)){
+    if (norm(meta.name)===norm(primaryLabel) || norm(k)===norm(primaryLabel)) { matchKey = k; break; }
+  }
+  if (!matchKey) return null;
+  const val = pollutants[matchKey];
+  if (val == null) return null;
+  const { unit } = META[matchKey];
+  return `${fmt(val, matchKey==='pm25'?1:2)} ${unit}`;
+}
+
+/* ---------- desktop rows (now with date) ---------------------------- */
+function buildRowsDesktop(sensor){
   const { name='—' } = sensor;
   const { aqhi=null, primary='—', pollutants={}, timestamp=null } = sensor.latest ?? {};
+  const lastSeen = fmtTS(timestamp, true); // include date+time on desktop
 
-  const lastSeen = timestamp
-    ? new Date(timestamp).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',hour12:false})
-    : '—';
-
-  /* summary */
   const row = document.createElement('tr');
   row.className='sensor-row';
   row.innerHTML=`
@@ -65,7 +85,6 @@ function buildRows(sensor){
     <td>${primary}</td>
     <td>${lastSeen}</td>`;
 
-  /* detail */
   const detail=document.createElement('tr');
   detail.className='sensor-detail';
   detail.style.display='none';
@@ -92,21 +111,86 @@ function buildRows(sensor){
   return [row,detail];
 }
 
-/* render */
-function render(){
-  tbody.innerHTML='';
-  [...sensors]
-    .sort((a,b)=>{
-      const av=keyVal(a,sortKey), bv=keyVal(b,sortKey);
-      return av>bv?sortDir : av<bv?-sortDir : 0;
-    })
-    .forEach(s=>{
-      const [r1,r2]=buildRows(s);
-      tbody.appendChild(r1); tbody.appendChild(r2);
-    });
+/* ---------- mobile card -------------------------------------------- */
+function buildCard(sensor){
+  const { name='—' } = sensor;
+  const { aqhi=null, primary='—', pollutants={}, timestamp=null } = sensor.latest ?? {};
+  const conc = primaryReading(primary, pollutants) ?? '—';
+  const last = fmtTS(timestamp, true);
+
+  const card = document.createElement('article');
+  card.className='sensor-card';
+  card.setAttribute('role','button');
+  card.setAttribute('tabindex','0');
+  card.setAttribute('aria-expanded','false');
+
+  card.innerHTML = `
+    <div class="sensor-card__left">
+      <h3 class="sensor-card__title">${name}</h3>
+      <div class="sensor-card__meta"><strong>${primary}</strong> · ${conc}</div>
+      <div class="sensor-card__meta">Last seen: ${last}</div>
+    </div>
+    <div class="sensor-card__right">
+      <div class="sensor-card__aqhi" style="background:${colourForAQHI(aqhi)}">${aqhi ?? '—'}</div>
+    </div>
+    <div class="sensor-card__detail">
+      <div><strong>AQHI:</strong> ${aqhi??'—'} (${aqhiBand(aqhi)} risk)</div>
+      <div><strong>Main Contributor:</strong> ${primary}</div>
+      <table class="poll-table" style="margin-top:.6rem">
+        <thead><tr><th>Pollutant</th><th>Conc.</th><th>Status</th></tr></thead>
+        <tbody>
+          ${Object.entries(META).map(([k,{name,unit,info,low,med}])=>{
+            const val=pollutants[k];
+            const status=val==null?'—':val<=low?'Low':val<=med?'Moderate':'High';
+            return`<tr>
+              <td title="${info}">${name}</td>
+              <td>${fmt(val,k==='pm25'?1:2)} ${unit}</td>
+              <td>${status}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const toggle=()=>{
+    const open = card.getAttribute('aria-expanded')==='true';
+    card.setAttribute('aria-expanded', String(!open));
+  };
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }});
+
+  return card;
 }
 
-/* header clicks → resort */
+/* ---------- render (switches view) ---------------------------------- */
+function render(){
+  const data = [...sensors].sort((a,b)=>{
+    const av=keyVal(a,sortKey), bv=keyVal(b,sortKey);
+    return av>bv?sortDir : av<bv?-sortDir : 0;
+  });
+
+  if (isMobile()){
+    // show cards, hide table
+    if (tableWrap) tableWrap.style.display='none';
+    if (cardsWrap){
+      cardsWrap.innerHTML='';
+      data.forEach(s => cardsWrap.appendChild(buildCard(s)));
+      cardsWrap.style.display='grid';
+    }
+  } else {
+    // show table, hide cards
+    if (cardsWrap){ cardsWrap.innerHTML=''; cardsWrap.style.display='none'; }
+    if (tableWrap) tableWrap.style.display='';
+    tbody.innerHTML='';
+    data.forEach(s=>{
+      const [r1,r2]=buildRowsDesktop(s);
+      tbody.appendChild(r1); tbody.appendChild(r2);
+    });
+  }
+}
+
+/* header clicks → resort (works for desktop; mobile headers are hidden) */
 headers.forEach(th=>{
   th.addEventListener('click',()=>{
     const key=th.dataset.key;
@@ -118,10 +202,14 @@ headers.forEach(th=>{
   });
 });
 
+/* Switch views on breakpoint changes */
+mqMobile.addEventListener?.('change', render);
+window.addEventListener('resize', ()=>{ /* fallback if older browsers */ });
+
 /* initial fetch */
 getSensorData()
   .then(({ sensors:list })=>{
-    sensors = list;      // no filtering
+    sensors = list;
     render();
   })
   .catch(err=>{

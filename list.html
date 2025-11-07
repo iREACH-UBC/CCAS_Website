@@ -77,22 +77,25 @@
   </header>
 
   <main id="main">
-    <!-- horizontal scroll wrapper prevents “smush” on tiny screens -->
+    <!-- desktop/table view -->
     <div class="table-scale-wrap">
-      <table id="sensor-table" class="scale-target shrink-33">
+      <table id="sensor-table" class="scale-target">
         <thead>
           <tr>
             <th data-key="name">Name ▲</th>
             <th data-key="aqhi">AQHI</th>
             <th data-key="primary">Main&nbsp;Contributor</th>
-            <!-- ⬇︎ was “Last Update” -->
             <th data-key="timestamp">Last&nbsp;Seen</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
+  
+    <!-- mobile/cards view -->
+    <div id="sensor-cards" class="sensor-cards"></div>
   </main>
+
 
   <footer id="stamp" class="site-footer">Updating&hellip;</footer>
 
