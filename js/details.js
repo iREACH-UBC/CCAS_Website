@@ -296,7 +296,7 @@ const dayDividersPlugin = {
     ctx.save();
     ctx.strokeStyle = 'rgba(0,0,0,.35)';
     ctx.lineWidth = 1.5;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
     ctx.fillStyle = 'rgba(0,0,0,.65)';
@@ -316,7 +316,7 @@ const dayDividersPlugin = {
       ctx.lineTo(px, bottom);
       ctx.stroke();
       // label at the top, inside the chart area
-      ctx.fillText(fmt.format(d), px, bottom + 16);
+      ctx.fillText(fmt.format(d), px, bottom - 6);
     }
     ctx.restore();
   }
