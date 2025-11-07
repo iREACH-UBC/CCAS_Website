@@ -116,9 +116,13 @@ async function drawChart () {
       return t >= tMin && t <= tMax;
     })
     .map(row => {
-      const v = +row[idx];
-      return { x: row[0], y: isNaN(v) ? null : v };
+      const raw = row[idx];
+      const str = raw == null ? '' : String(raw).trim();
+      const parsed = parseFloat(str);
+      const y = (!str || !Number.isFinite(parsed)) ? null : parsed;  // '', null, 'NA', 'NaN', 'null' → gap
+      return { x: row[0], y };
     });
+
 
   const numeric = points.filter(p => p.y != null);
   if (!numeric.length) {
@@ -142,7 +146,7 @@ async function drawChart () {
       borderColor: '#004b8d',
       borderWidth: 2,
       pointRadius: 0,
-      spanGaps: true,
+      spanGaps: false,
       tension: 0.3
     }]},
     options: {
