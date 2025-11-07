@@ -166,7 +166,7 @@ async function drawChart () {
         data: points,
         borderColor: '#004b8d',
         backgroundColor: grad,
-        fill: true,
+        fill: false,
         borderWidth: 2,
         pointRadius: (ctx) => gapEnds.has(ctx.dataIndex) ? 2.5 : 0,
         pointHoverRadius: 4,
