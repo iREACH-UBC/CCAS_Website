@@ -166,7 +166,7 @@ async function drawChart () {
         data: points,
         borderColor: '#004b8d',
         backgroundColor: grad,
-        fill: false,
+        fill: true, //controls the underline gradient
         borderWidth: 2,
         pointRadius: (ctx) => gapEnds.has(ctx.dataIndex) ? 2.5 : 0,
         pointHoverRadius: 4,
@@ -177,7 +177,7 @@ async function drawChart () {
     options: {
       responsive: true,
       animation: { duration: 450, easing: 'easeOutQuart' },
-      layout: { padding: { top: 6 } },
+      layout: { padding: { top: 18 } },
       interaction: { mode: 'index', intersect: false },
       plugins: {
         title: {
@@ -239,7 +239,7 @@ async function drawChart () {
         }
       }
     },
-    plugins: [crosshairPlugin, yBandsPlugin, nowLinePlugin]
+    plugins: [crosshairPlugin, dayDividersPlugin]
   });
 
 }
@@ -285,22 +285,39 @@ const yBandsPlugin = {
   }
 };
 
-// Faint “now” line
-const nowLinePlugin = {
-  id: 'nowLine',
-  afterDatasetsDraw(chart) {
-    const { ctx, chartArea, scales: { x } } = chart;
-    const now = Date.now();
-    if (now < x.min || now > x.max) return;
-    const xPos = x.getPixelForValue(now);
+// Draw a vertical line at each midnight boundary, with a date label at the top
+const dayDividersPlugin = {
+  id: 'dayDividers',
+  beforeDatasetsDraw(chart) {
+    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+    if (!x || !Number.isFinite(x.min) || !Number.isFinite(x.max)) return;
+
+    // style
     ctx.save();
-    ctx.setLineDash([2, 2]);
-    ctx.strokeStyle = 'rgba(0,0,0,.25)';
-    ctx.beginPath();
-    ctx.moveTo(xPos, chartArea.top);
-    ctx.lineTo(xPos, chartArea.bottom);
-    ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,.35)';
+    ctx.lineWidth = 1.5;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillStyle = 'rgba(0,0,0,.65)';
+
+    const fmt = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+
+    // first midnight strictly after the left edge
+    const first = new Date(x.min);
+    first.setHours(0, 0, 0, 0);
+    if (first.getTime() <= x.min) first.setDate(first.getDate() + 1);
+
+    for (let d = new Date(first); d.getTime() <= x.max; d.setDate(d.getDate() + 1)) {
+      const px = x.getPixelForValue(d);
+      // line
+      ctx.beginPath();
+      ctx.moveTo(px, top);
+      ctx.lineTo(px, bottom);
+      ctx.stroke();
+      // label at the top, inside the chart area
+      ctx.fillText(fmt.format(d), px, top + 4);
+    }
     ctx.restore();
   }
 };
-
