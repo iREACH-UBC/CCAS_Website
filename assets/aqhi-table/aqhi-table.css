@@ -49,3 +49,10 @@
 .actions li{margin:.5rem 0}
 .pm.dash-top{border-top:2px dashed rgba(0,0,0,.18)}
 .aqhi__sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Mobile: shrink type/padding and let the table fit the container */
+@media (max-width: 720px) {
+  .aqhi { font-size: 14px; }
+  .aqhi td, .aqhi th { padding: 10px 12px; }
+  .aqhi .aqhi__table { min-width: 0; }  /* allow narrower than 1120px */
+}

@@ -34,6 +34,25 @@
     main.info details[id]{
       scroll-margin-top: calc(var(--header-offset) + 8px);
     }
+    /* Keep the opened dropdown from making the whole page huge on mobile */
+    @media (max-width: 720px) {
+      /* The container that holds the table when the details is open */
+      #what-is-the-scale-for-the-aqhi[open] .aqhi-panel{
+        max-height: 70vh;              /* cap height to the viewport */
+        overflow: auto;                /* scroll inside the panel */
+        margin: .5rem 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        -webkit-overflow-scrolling: touch; /* smoother iOS scroll */
+      }
+    
+      /* Horizontal scroll if table is wider than the screen */
+      #what-is-the-scale-for-the-aqhi .aqhi-xscroll{
+        overflow-x: auto;
+      }
+    }
 
   </style>
 </head>
@@ -96,7 +115,14 @@
           <li><strong>7–9:</strong> High health risk</li>
           <li><strong>10+:</strong> Very high health risk</li>
         </ul>
-        <aqhi-table style="display:block; transform:scale(.35); transform-origin: top left;"></aqhi-table>
+        <!-- Compact, scrollable wrapper so the page height stays sane on mobile -->
+        <div class="aqhi-panel">
+          <div class="aqhi-xscroll">
+            <!-- remove the transform:scale -->
+            <aqhi-table id="aqhiScale"></aqhi-table>
+          </div>
+        </div>
+
       </details>
 
       <details id="how-is-the-aqhi-calculated">
