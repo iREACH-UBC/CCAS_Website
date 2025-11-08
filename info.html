@@ -8,9 +8,6 @@
   <!-- Main stylesheet -->
   <link rel="stylesheet" href="css/style.css?v=20251029" />
   
-  <!-- aqi-table loader -->
-  <script type="module" src="/assets/aqhi-table/aqhi-table.js"></script>
-  
   <!-- Page-specific (minimal) -->
   <style>
     /* Constrain and center the article content on this page only */
@@ -33,12 +30,6 @@
     main.info section[id],
     main.info details[id]{
       scroll-margin-top: calc(var(--header-offset) + 8px);
-    }
-    /* Ensure the component behaves like a normal block container */
-    aqhi-table {
-      display: block;
-      width: 100%;
-      max-width: 100%;
     }
 
     /* Keep the opened dropdown from making the whole page huge on mobile */
@@ -122,11 +113,21 @@
           <li><strong>7–9:</strong> High health risk</li>
           <li><strong>10+:</strong> Very high health risk</li>
         </ul>
-        <!-- Compact, scrollable wrapper so the page height stays sane on mobile -->
-        <div class="aqhi-panel">
-          <div class="aqhi-xscroll">
-            <!-- remove the transform:scale -->
-            <aqhi-table id="aqhiScale"></aqhi-table>
+        <!-- Responsive, scroll-safe image so the page never stretches on mobile -->
+        <div class="aqhi-img-wrap">
+          <picture>
+            <img
+              class="aqhi-img"
+              src="./assets/aqhi-table/heat-index-table.png"
+              srcset="./assets/aqhi-table/heat-index-table.png, ./assets/aqhi-table/heat-index-table@2x.png 2x"
+              sizes="(max-width: 900px) 100vw, 900px"
+              alt="AQHI scale with PM2.5 ranges, provincial AQHI values, risk categories, health guidance, and smoke-exposure actions."
+              loading="lazy"
+              decoding="async"
+            >
+          </picture>
+        </div>
+
           </div>
         </div>
 

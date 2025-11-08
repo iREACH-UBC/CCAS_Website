@@ -332,3 +332,20 @@ main details[id]{
   .sensor-card[aria-expanded="true"] .sensor-card__detail{ display:block; }
 }
 
+/* AQHI SCALE TABLE IMAGE */
+.aqhi-img { display:block; max-width:100%; height:auto; }
+
+/* Prevent the opened dropdown from growing the page too tall */
+@media (max-width: 1080px) {
+  #what-is-the-scale-for-the-aqhi[open] .aqhi-img-wrap{
+    max-height: 70vh;        /* cap height to viewport */
+    overflow: auto;          /* scroll inside the panel if needed */
+    margin: .5rem 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
