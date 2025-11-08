@@ -71,6 +71,9 @@
   });
 </script>
 
+// aqhi-table loader
+<script type="module" src="/assets/aqhi-table/aqhi-table.js"></script>
+
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
@@ -122,21 +125,22 @@
       <!-- Compact, collapsible appendix content -->
       <details id="what-is-the-scale-for-the-aqhi">
         <summary><strong>AQHI scale (1–10+)</strong></summary>
-        <p>The AQHI/AQHI+ scale ranges from 1–10+, grouped into health-risk categories:</p>
+        <p>The Air Quality Health Index (AQHI) is a scale that illustrates health risks associated with regional air quality. It is designed to help you identify the level of risk health associated to outdoor air quality. The AQHI+ is an updated index that is designed to capture sudden or temporary spikes in pollution from wildfire smoke. The AQHI and AQHI+ scales range from 1–10+, grouped into health-risk categories:</p>
         <ul>
           <li><strong>1–3:</strong> Low health risk</li>
           <li><strong>4–6:</strong> Moderate health risk</li>
           <li><strong>7–9:</strong> High health risk</li>
           <li><strong>10+:</strong> Very high health risk</li>
         </ul>
+        <aqhi-table></aqhi-table>
       </details>
 
       <details id="how-is-the-aqhi-calculated">
         <summary><strong>How is the AQHI calculated?</strong></summary>
-        <p>In British Columbia, two calculations are made and the higher value is reported:</p>
+        <p>The AQHI is calculated based on the relative risks of a combination of common air pollutants that is known to harm human health. In British Columbia, two calculations are done and the higher value is reported:</p>
         <ol>
           <li>
-            A combined health-risk calculation using three pollutants:
+            A calculation using three pollutants:
             <ol type="a">
               <li>Ozone (O<sub>3</sub>) at ground level,</li>
               <li>Fine Particulate Matter (PM<sub>2.5</sub>), and</li>
@@ -145,6 +149,7 @@
           </li>
           <li>Fine Particulate Matter (PM<sub>2.5</sub>) concentration alone.</li>
         </ol>
+        <p>This means that in periods of high PM<sub>2.5</sub> concentrations, the AQHI+ depends exclusively on PM<sub>2.5</sub> concentrations. </p>
       </details>
     </section>
 

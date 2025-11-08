@@ -1,0 +1,111 @@
+<!-- AQHI table -->
+<section class="aqhi" aria-label="Air Quality Health Index table">
+  <div class="aqhi__head">
+    <h2>Air Quality Health Index (AQHI)</h2>
+    <p class="aqhi__sub">Thresholds, risk categories, health guidance, and actions to reduce wildfire smoke exposure.</p>
+  </div>
+
+  <div class="aqhi__scroll" tabindex="0">
+    <table class="aqhi__table" aria-describedby="aqhi-cap">
+      <caption id="aqhi-cap" class="aqhi__sr">AQHI table with PM2.5 thresholds, AQHI values, risk categories, health messages, and actions.</caption>
+      <thead>
+        <tr>
+          <th class="col-swatch"></th>
+          <th class="col-pm">1-HOUR<br>PM<sub>2.5</sub> (µg/m³)</th>
+          <th class="col-prov">Provincial<br>AQHI</th>
+          <th class="col-risk">AQHI Risk<br>Category</th>
+          <th class="col-hi-risk">Health message for people at higher risk</th>
+          <th class="col-gen">Health message for general population</th>
+          <th>Actions to reduce wildfire smoke exposure</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- LOW -->
+        <tr>
+          <td class="swatch low-1"></td>
+          <td class="pm low">0 – 10</td>
+          <td class="prov low">1</td>
+          <td class="risk low" rowspan="3">LOW</td>
+          <td class="hi-risk low" rowspan="3"><strong>Enjoy</strong> your usual outdoor activities.</td>
+          <td class="gen low" rowspan="3"><strong>Ideal air quality</strong> for outdoor activities.</td>
+          <td class="actions"><strong>Normal air quality</strong> in British Columbia.</td>
+        </tr>
+        <tr>
+          <td class="swatch low-2"></td>
+          <td class="pm low">11 – 20</td>
+          <td class="prov low">2</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="swatch low-3"></td>
+          <td class="pm low">21 – 30</td>
+          <td class="prov low">3</td>
+          <td></td>
+        </tr>
+
+        <!-- MODERATE -->
+        <tr>
+          <td class="swatch mod-1"></td>
+          <td class="pm mod">31 – 40</td>
+          <td class="prov mod">4</td>
+          <td class="risk mod" rowspan="3">MODERATE</td>
+          <td class="hi-risk mod" rowspan="3"><strong>Consider reducing</strong> or rescheduling strenuous activities outdoors if you experience symptoms.</td>
+          <td class="gen mod" rowspan="3"><strong>No need to modify</strong> your usual outdoor activities unless you experience symptoms.</td>
+          <td class="actions" rowspan="8">
+            <ul>
+              <li>Use a portable air cleaner or DIY box fan air cleaner to reduce smoke in your home.</li>
+              <li>Stay inside with doors and windows closed, but keep cool – heat-related illness is more risky than breathing smoke for most people.</li>
+              <li>Visit places with cleaner and cooler air, such as libraries, community centres, and shopping malls.</li>
+              <li>Wear a well-fitted respirator (e.g., N95) outdoors.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="swatch mod-2"></td>
+          <td class="pm mod dash-top">41 – 50</td>
+          <td class="prov mod">5</td>
+        </tr>
+        <tr>
+          <td class="swatch mod-3"></td>
+          <td class="pm mod dash-top">51 – 60</td>
+          <td class="prov mod">6</td>
+        </tr>
+
+        <!-- HIGH -->
+        <tr>
+          <td class="swatch high-1"></td>
+          <td class="pm high">61 – 70</td>
+          <td class="prov high">7</td>
+          <td class="risk high" rowspan="4">HIGH</td>
+          <td class="hi-risk high" rowspan="4"><strong>Reduce</strong> or reschedule strenuous activity outdoors.</td>
+          <td class="gen high" rowspan="4"><strong>Consider reducing or rescheduling</strong> strenuous activities outdoors if you experience symptoms.</td>
+        </tr>
+        <tr>
+          <td class="swatch high-2"></td>
+          <td class="pm high dash-top">71 – 80</td>
+          <td class="prov high">8</td>
+        </tr>
+        <tr>
+          <td class="swatch high-3"></td>
+          <td class="pm high dash-top">81 – 90</td>
+          <td class="prov high">9</td>
+        </tr>
+        <tr>
+          <td class="swatch high-4"></td>
+          <td class="pm high dash-top">91 – 100</td>
+          <td class="prov high">10</td>
+        </tr>
+
+        <!-- VERY HIGH -->
+        <tr>
+          <td class="swatch vhigh-1"></td>
+          <td class="pm vhigh">101+</td>
+          <td class="prov vhigh">10+</td>
+          <td class="risk vhigh">VERY HIGH</td>
+          <td class="hi-risk vhigh"><strong>Avoid</strong> strenuous activity outdoors.</td>
+          <td class="gen vhigh"><strong>Reduce or reschedule</strong> strenuous activity outdoors, especially if you experience symptoms.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
