@@ -34,8 +34,15 @@
     main.info details[id]{
       scroll-margin-top: calc(var(--header-offset) + 8px);
     }
+    /* Ensure the component behaves like a normal block container */
+    aqhi-table {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+
     /* Keep the opened dropdown from making the whole page huge on mobile */
-    @media (max-width: 720px) {
+    @media (max-width: 1080px) {
       /* The container that holds the table when the details is open */
       #what-is-the-scale-for-the-aqhi[open] .aqhi-panel{
         max-height: 70vh;              /* cap height to the viewport */
