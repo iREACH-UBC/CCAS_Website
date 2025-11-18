@@ -70,8 +70,39 @@ function loadState (sensors) {
 const sensorSel    = document.getElementById('sensor-select');
 const pollutantSel = document.getElementById('pollutant-select');
 const ctx          = document.getElementById('pollutant-chart').getContext('2d');
+const warningEl    = document.getElementById('sensor-warning');
 
 let chart;
+
+/* ---------- Stale sensor warning ----------------------------------------- */
+
+const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+function updateStaleWarning(lastSampleDate, sensor) {
+  if (!warningEl || !(lastSampleDate instanceof Date) || isNaN(lastSampleDate)) return;
+
+  const ageMs = Date.now() - lastSampleDate.getTime();
+
+  if (ageMs > STALE_THRESHOLD_MS) {
+    warningEl.hidden = false;
+    warningEl.innerHTML = `
+      <div class="sensor-offline-warning__icon" aria-hidden="true">⚠️</div>
+      <div class="sensor-offline-warning__text">
+        <strong>This sensor may be offline.</strong><br>
+        The most recent data point for
+        <span class="sensor-offline-warning__sensor">${sensor.name || sensor.id}</span>
+        is more than 2 hours old.<br>
+        Learn how power cycling can affect sensor data accuracy in
+        <a href="power-cycling-and-data-accuracy.html">
+          this guide
+        </a>.
+      </div>
+    `;
+  } else {
+    warningEl.hidden = true;
+    warningEl.innerHTML = '';
+  }
+}
 
 /* ---------- Initialise --------------------------------------------------- */
 
@@ -110,12 +141,19 @@ async function drawChart () {
     : FIXED[pollutantSel.value];
 
   /* ----- Define exact 24-h window --------------------------------------- */
-  const lastDt = new Date(sensor.history.at(-1)[0]);
+  const lastRaw = new Date(sensor.history.at(-1)[0]);  // actual last sample time
+  const lastDt  = new Date(lastRaw);                   // axis end (may be rounded)
+
+  // Round axis end up to the next hour if needed (for nicer x-axis)
   if (lastDt.getMinutes() || lastDt.getSeconds() || lastDt.getMilliseconds()) {
     lastDt.setHours(lastDt.getHours() + 1, 0, 0, 0);
   }
   const tMax = +lastDt;
   const tMin = tMax - 24 * 60 * 60 * 1000;
+
+  // 🔔 Update stale sensor warning using the *raw* timestamp
+  updateStaleWarning(lastRaw, sensor);
+
 
   /* ----- Build dataset --------------------------------------------------- */
   const points = sensor.history

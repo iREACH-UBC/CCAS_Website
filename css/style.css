@@ -349,3 +349,28 @@ main details[id]{
   }
 }
 
+
+/* Offline / stale sensor warning (details page) */
+.sensor-offline-warning{
+  display:flex;
+  align-items:flex-start;
+  gap:.5rem;
+  margin:0 0 1rem 0;
+  padding:.5rem .75rem;
+  border-radius: var(--radius);
+  background:#fff4e5;           /* soft amber */
+  border:1px solid #f2a65a;     /* slightly darker border */
+  font-size:.9rem;
+  color:#5b3100;
+}
+
+.sensor-offline-warning__icon{
+  font-size:1.3rem;
+  line-height:1;
+}
+
+.sensor-offline-warning__text a{
+  font-weight:600;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}

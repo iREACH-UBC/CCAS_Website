@@ -68,7 +68,13 @@
         <option value="CO2">CO₂</option>
       </select>
     </section>
-
+    <!-- NEW: stale sensor warning -->
+    <section id="sensor-warning"
+             class="sensor-offline-warning"
+             hidden
+             aria-live="polite">
+    </section>
+    
     <section>
       <canvas id="pollutant-chart" height="220"></canvas>
     </section>
