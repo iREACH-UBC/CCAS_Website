@@ -79,19 +79,30 @@ let chart;
 const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 function updateStaleWarning(lastSampleDate, sensor) {
-  if (!warningEl || !(lastSampleDate instanceof Date) || isNaN(lastSampleDate)) return;
+  if (!warningEl) return;
 
-  const ageMs = Date.now() - lastSampleDate.getTime();
+  let show = false;
+  let extraLine = '';
 
-  if (ageMs > STALE_THRESHOLD_MS) {
+  if (!(lastSampleDate instanceof Date) || isNaN(lastSampleDate)) {
+    // No valid data at all
+    show = true;
+    extraLine = 'There is no recent data available for this sensor.';
+  } else {
+    const ageMs = Date.now() - lastSampleDate.getTime();
+    show = ageMs > STALE_THRESHOLD_MS;
+    extraLine = `The most recent data point was recorded at ${lastSampleDate.toLocaleString()}.`;
+  }
+
+  if (show) {
     warningEl.hidden = false;
     warningEl.innerHTML = `
       <div class="sensor-offline-warning__icon" aria-hidden="true">⚠️</div>
       <div class="sensor-offline-warning__text">
         <strong>This sensor may be offline.</strong><br>
-        The most recent data point for
-        <span class="sensor-offline-warning__sensor">${sensor.name || sensor.id}</span>
-        is more than 2 hours old.<br>
+        There is no data in the last two hours for
+        <span class="sensor-offline-warning__sensor">${sensor.name || sensor.id}</span>.<br>
+        ${extraLine}<br>
         Learn how power cycling can affect sensor data accuracy in
         <a href="power-cycling-and-data-accuracy.html">
           this guide
@@ -103,6 +114,7 @@ function updateStaleWarning(lastSampleDate, sensor) {
     warningEl.innerHTML = '';
   }
 }
+
 
 /* ---------- Initialise --------------------------------------------------- */
 
@@ -151,10 +163,6 @@ async function drawChart () {
   const tMax = +lastDt;
   const tMin = tMax - 24 * 60 * 60 * 1000;
 
-  // 🔔 Update stale sensor warning using the *raw* timestamp
-  updateStaleWarning(lastRaw, sensor);
-
-
   /* ----- Build dataset --------------------------------------------------- */
   const points = sensor.history
     .filter(row => {
@@ -169,22 +177,57 @@ async function drawChart () {
       return { x: row[0], y };
     });
 
-
   const numeric = points.filter(p => p.y != null);
-  if (!numeric.length) {
-    ctx.canvas.parentNode.innerHTML =
-      `<p style="padding:1rem;color:#c00">No data for ${pollutantSel.value} at ${sensor.name || sensor.id}</p>`;
-    return;
+  const lastValidTime = numeric.length
+    ? new Date(numeric[numeric.length - 1].x)
+    : null;
+
+  // 🔔 Update stale sensor warning using the *last valid data point*
+  updateStaleWarning(lastValidTime, sensor);
+
+  // Update footer with last *file* timestamp (unchanged behaviour)
+  document.getElementById('stamp').textContent =
+    'Last seen ' + lastRaw.toLocaleString();
+
+  /* ----- Compute no-data ranges for shading ----------------------------- */
+  const noDataRanges = [];
+  let currentGapStartMs = null;
+
+  // Gaps where y === null
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const tMs = Date.parse(p.x);
+    if (p.y == null) {
+      if (currentGapStartMs === null) currentGapStartMs = tMs;
+    } else if (currentGapStartMs !== null) {
+      noDataRanges.push([currentGapStartMs, tMs]);
+      currentGapStartMs = null;
+    }
+  }
+  // If we ended inside a gap, extend to tMax
+  if (currentGapStartMs !== null) {
+    noDataRanges.push([currentGapStartMs, tMax]);
   }
 
-  // Update footer with last-seen timestamp for this sensor
-  document.getElementById('stamp').textContent =
-    'Last seen ' + new Date(sensor.history.at(-1)[0]).toLocaleString();
+  // If there is *no* numeric data at all, shade the whole window
+  if (!numeric.length) {
+    noDataRanges.length = 0;
+    noDataRanges.push([tMin, tMax]);
+  }
+
+  // If the sensor is stale but we have at least one valid point, also
+  // gray out from the last valid point to the end of the window
+  if (lastValidTime) {
+    const ageMs = Date.now() - lastValidTime.getTime();
+    if (ageMs > STALE_THRESHOLD_MS && lastValidTime.getTime() < tMax) {
+      noDataRanges.push([lastValidTime.getTime(), tMax]);
+    }
+  }
 
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
 
-    // --- Beautify: gradient fill, gap-end dots, lighter grids, smarter tooltips ---
+  // --- Beautify: gradient fill, gap-end dots, lighter grids, smarter tooltips ---
   const grad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
   grad.addColorStop(0, 'rgba(0,75,141,0.22)');
   grad.addColorStop(1, 'rgba(0,75,141,0)');
@@ -195,6 +238,9 @@ async function drawChart () {
     const cur = points[i]?.y, next = points[i+1]?.y, prev = points[i-1]?.y;
     if (cur != null && (next == null || prev == null)) gapEnds.add(i);
   }
+
+  // Safe max for y-axis
+  const maxY = numeric.length ? Math.max(...numeric.map(p => p.y)) : 1;
 
   chart = new Chart(ctx, {
     type: 'line',
@@ -241,7 +287,12 @@ async function drawChart () {
           }
         },
         // Built-in decimation keeps it smooth with lots of points
-        decimation: { enabled: true, algorithm: 'lttb', samples: 300 }
+        decimation: { enabled: true, algorithm: 'lttb', samples: 300 },
+
+        // NEW: ranges for the no-data shading plugin
+        noDataGaps: {
+          ranges: noDataRanges
+        }
       },
       scales: {
         x: {
@@ -264,7 +315,7 @@ async function drawChart () {
         },
         y: {
           beginAtZero: true,
-          suggestedMax: Math.max(...numeric.map(p => p.y)) * 1.1,
+          suggestedMax: maxY * 1.1,
           grid: { color: 'rgba(0,0,0,.06)' },
           ticks: {
             callback: (v) => {
@@ -277,10 +328,12 @@ async function drawChart () {
         }
       }
     },
-    plugins: [crosshairPlugin, dayDividersPlugin]
+    // NEW: include the gap-shading plugin
+    plugins: [crosshairPlugin, dayDividersPlugin, noDataGapsPlugin]
   });
 
 }
+
 
 /* ---------- Cross-hair plugin ------------------------------------------- */
 const crosshairPlugin = {
@@ -359,3 +412,30 @@ const dayDividersPlugin = {
     ctx.restore();
   }
 };
+
+// Shade periods with no data for the selected pollutant
+const noDataGapsPlugin = {
+  id: 'noDataGaps',
+  beforeDatasetsDraw(chart, args, opts) {
+    const ranges = opts?.ranges;
+    if (!ranges || !ranges.length) return;
+
+    const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+    if (!x) return;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.04)'; // light gray veil
+
+    for (const [startMs, endMs] of ranges) {
+      const xStart = x.getPixelForValue(startMs);
+      const xEnd   = x.getPixelForValue(endMs);
+      const leftPx  = Math.max(left, Math.min(xStart, xEnd));
+      const rightPx = Math.min(right, Math.max(xStart, xEnd));
+      if (rightPx <= leftPx) continue;
+      ctx.fillRect(leftPx, top, rightPx - leftPx, bottom - top);
+    }
+
+    ctx.restore();
+  }
+};
+
