@@ -8,5 +8,5 @@
 # For single-page apps / client-side routing (optional)
 [[redirects]]
   from = "/*"
-  to   = "/index.html"
+  to   = "/Offline.html"
   status = 200
