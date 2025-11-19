@@ -182,7 +182,6 @@ async function drawChart () {
     ? new Date(numeric[numeric.length - 1].x)
     : null;
   
-  // 🔔 Use the *last uploaded row* to decide staleness
   const lastUploadTime = sensor.history?.length
     ? new Date(sensor.history[sensor.history.length - 1][0])
     : null;
@@ -198,40 +197,54 @@ async function drawChart () {
   }
 
 
-  /* ----- Compute no-data ranges for shading ----------------------------- */
-  const noDataRanges = [];
-  let currentGapStartMs = null;
-
-  // Gaps where y === null
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
-    const tMs = Date.parse(p.x);
-    if (p.y == null) {
-      if (currentGapStartMs === null) currentGapStartMs = tMs;
-    } else if (currentGapStartMs !== null) {
-      noDataRanges.push([currentGapStartMs, tMs]);
-      currentGapStartMs = null;
+    /* ----- Compute no-data ranges for shading ----------------------------- */
+    const noDataRanges = [];
+  
+    if (!points.length) {
+      // No rows at all in this window → shade the whole thing
+      noDataRanges.push([tMin, tMax]);
+    } else {
+      const firstTimeMs = Date.parse(points[0].x);
+      const lastTimeMs  = Date.parse(points[points.length - 1].x);
+  
+      // 1) From left edge of the 24-h window to the first point
+      if (firstTimeMs > tMin) {
+        noDataRanges.push([tMin, firstTimeMs]);
+      }
+  
+      // 2) Gaps where the pollutant has no usable value (y === null)
+      let currentGapStartMs = null;
+      for (let i = 0; i < points.length; i++) {
+        const p   = points[i];
+        const tMs = Date.parse(p.x);
+  
+        if (p.y == null) {
+          // start a gap if we weren't already inside one
+          if (currentGapStartMs === null) currentGapStartMs = tMs;
+        } else if (currentGapStartMs !== null) {
+          // we just left a null stretch
+          noDataRanges.push([currentGapStartMs, tMs]);
+          currentGapStartMs = null;
+        }
+      }
+  
+      // If we ended still inside a null stretch, close it at the last point time
+      if (currentGapStartMs !== null) {
+        noDataRanges.push([currentGapStartMs, lastTimeMs]);
+      }
+  
+      // 3) From the last point to the right edge of the 24-h window
+      if (lastTimeMs < tMax) {
+        noDataRanges.push([lastTimeMs, tMax]);
+      }
+  
+      // 4) If there is *no numeric data at all* for this pollutant, shade the whole window
+      if (!numeric.length) {
+        noDataRanges.length = 0;
+        noDataRanges.push([tMin, tMax]);
+      }
     }
-  }
-  // If we ended inside a gap, extend to tMax
-  if (currentGapStartMs !== null) {
-    noDataRanges.push([currentGapStartMs, tMax]);
-  }
 
-  // If there is *no* numeric data at all, shade the whole window
-  if (!numeric.length) {
-    noDataRanges.length = 0;
-    noDataRanges.push([tMin, tMax]);
-  }
-
-  // If the sensor is stale but we have at least one valid point, also
-  // gray out from the last valid point to the end of the window
-  if (lastValidTime) {
-    const ageMs = Date.now() - lastValidTime.getTime();
-    if (ageMs > STALE_THRESHOLD_MS && lastValidTime.getTime() < tMax) {
-      noDataRanges.push([lastValidTime.getTime(), tMax]);
-    }
-  }
 
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
