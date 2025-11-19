@@ -181,13 +181,22 @@ async function drawChart () {
   const lastValidTime = numeric.length
     ? new Date(numeric[numeric.length - 1].x)
     : null;
+  
+  // 🔔 Use the *last uploaded row* to decide staleness
+  const lastUploadTime = sensor.history?.length
+    ? new Date(sensor.history[sensor.history.length - 1][0])
+    : null;
+  
+  updateStaleWarning(lastUploadTime, sensor);
+  
+  // Footer still uses the same timestamp
+  if (lastUploadTime instanceof Date && !isNaN(lastUploadTime)) {
+    document.getElementById('stamp').textContent =
+      'Last seen ' + lastUploadTime.toLocaleString();
+  } else {
+    document.getElementById('stamp').textContent = 'Last seen: unknown';
+  }
 
-  // 🔔 Update stale sensor warning using the *last valid data point*
-  updateStaleWarning(lastValidTime, sensor);
-
-  // Update footer with last *file* timestamp (unchanged behaviour)
-  document.getElementById('stamp').textContent =
-    'Last seen ' + lastRaw.toLocaleString();
 
   /* ----- Compute no-data ranges for shading ----------------------------- */
   const noDataRanges = [];
