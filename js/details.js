@@ -165,45 +165,50 @@ async function drawChart () {
   const tMax = +lastDt;
   const tMin = tMax - 24 * 60 * 60 * 1000;
 
-    /* ----- Build dataset --------------------------------------------------- */
-    // 1) Raw points from history in the 24-h window
-    const rawPoints = sensor.history
-      .filter(row => {
-        const t = Date.parse(row[0]);
-        return t >= tMin && t <= tMax;
-      })
-      .map(row => {
-        const raw   = row[idx];
-        const str   = raw == null ? '' : String(raw).trim();
-        const parsed = parseFloat(str);
-        const y = (!str || !Number.isFinite(parsed)) ? null : parsed;  // '', null, 'NA', 'NaN', 'null' → gap
-        return { x: row[0], y };
-      });
-  
-    // 2) Insert null points to BREAK the line across big time gaps (> 30 min)
-    let points = [];
-    for (let i = 0; i < rawPoints.length; i++) {
-      const p = rawPoints[i];
-  
-      if (i > 0) {
-        const prev = rawPoints[i - 1];
-        const t0 = Date.parse(prev.x);
-        const t1 = Date.parse(p.x);
-  
-        if (Number.isFinite(t0) && Number.isFinite(t1) && (t1 - t0) > GAP_THRESHOLD_MS) {
-          // Insert a null point in the middle of the gap → spanGaps:false will break here
-          const mid = new Date((t0 + t1) / 2);
-          points.push({ x: mid.toISOString(), y: null });
+      /* ----- Build dataset --------------------------------------------------- */
+      // 1) Raw points from history in the 24-h window
+      const rawPoints = sensor.history
+        .filter(row => {
+          const t = Date.parse(row[0]);
+          return t >= tMin && t <= tMax;
+        })
+        .map(row => {
+          const raw   = row[idx];
+          const str   = raw == null ? '' : String(raw).trim();
+          const parsed = parseFloat(str);
+          const y = (!str || !Number.isFinite(parsed)) ? null : parsed;  // '', null, 'NA', 'NaN', 'null' → gap
+          return { x: row[0], y };
+        });
+    
+      // 2) Insert null points to BREAK the line across big time gaps (> 30 min)
+      let points = [];
+      for (let i = 0; i < rawPoints.length; i++) {
+        const p = rawPoints[i];
+    
+        if (i > 0) {
+          const prev = rawPoints[i - 1];
+          const t0 = Date.parse(prev.x);
+          const t1 = Date.parse(p.x);
+    
+          if (Number.isFinite(t0) && Number.isFinite(t1) && (t1 - t0) > GAP_THRESHOLD_MS) {
+            // Add two nulls near the edges of the gap
+            const gapStart = t0 + 60 * 1000;  // +1 min from previous point
+            const gapEnd   = t1 - 60 * 1000;  // -1 min before next point
+            if (gapEnd > gapStart) {
+              points.push({ x: new Date(gapStart).toISOString(), y: null });
+              points.push({ x: new Date(gapEnd).toISOString(),   y: null });
+            }
+          }
         }
+    
+        points.push(p);
       }
-  
-      points.push(p);
-    }
-  
-    const numeric = points.filter(p => p.y != null);
-    const lastValidTime = numeric.length
-      ? new Date(numeric[numeric.length - 1].x)
-      : null;
+    
+      const numeric = points.filter(p => p.y != null);
+      const lastValidTime = numeric.length
+        ? new Date(numeric[numeric.length - 1].x)
+        : null;
+
 
   
   const lastUploadTime = sensor.history?.length
@@ -221,68 +226,49 @@ async function drawChart () {
   }
 
 
-      /* ----- Compute no-data ranges for shading ----------------------------- */
-      const noDataRanges = [];
-    
-      if (!points.length) {
-        // No rows at all in this 24-h window → shade the whole thing
-        noDataRanges.push([tMin, tMax]);
-      } else {
-        const firstTimeMs = Date.parse(points[0].x);
-        const lastTimeMs  = Date.parse(points[points.length - 1].x);
-    
-        // 1) From left edge of the 24-h window to the first point
-        if (firstTimeMs > tMin) {
-          noDataRanges.push([tMin, firstTimeMs]);
-        }
-    
-        // 2) Stretches where the pollutant has no usable value (y === null)
-        let currentGapStartMs = null;
-        for (let i = 0; i < points.length; i++) {
-          const p   = points[i];
-          const tMs = Date.parse(p.x);
-    
-          if (p.y == null) {
-            if (currentGapStartMs === null) currentGapStartMs = tMs;
-          } else if (currentGapStartMs !== null) {
-            noDataRanges.push([currentGapStartMs, tMs]);
-            currentGapStartMs = null;
+        /* ----- Compute no-data ranges for shading ----------------------------- */
+        const noDataRanges = [];
+      
+        if (!points.length) {
+          // No rows at all in this 24-h window → shade the whole thing
+          noDataRanges.push([tMin, tMax]);
+        } else {
+          const firstTimeMs = Date.parse(points[0].x);
+          const lastTimeMs  = Date.parse(points[points.length - 1].x);
+      
+          // 1) From left edge of the 24-h window to the first point
+          if (firstTimeMs > tMin) {
+            noDataRanges.push([tMin, firstTimeMs]);
           }
-        }
-        if (currentGapStartMs !== null) {
-          noDataRanges.push([currentGapStartMs, lastTimeMs]);
-        }
-    
-        // 3) From the last point to the right edge of the 24-h window
-        if (lastTimeMs < tMax) {
-          noDataRanges.push([lastTimeMs, tMax]);
-        }
-    
-        // 4) Gaps where there are simply NO rows at all (true time skip > 30 min)
-        for (let i = 0; i < rawPoints.length - 1; i++) {
-          const t0 = Date.parse(rawPoints[i].x);
-          const t1 = Date.parse(rawPoints[i + 1].x);
-          if (!Number.isFinite(t0) || !Number.isFinite(t1)) continue;
-    
-          const dt = t1 - t0;
-          if (dt > GAP_THRESHOLD_MS) {
-            // Optionally nudge inwards so we don't shade directly under dots
-            const gapStart = t0 + 60 * 1000;  // +1 min
-            const gapEnd   = t1 - 60 * 1000;  // -1 min
-            if (gapEnd > gapStart) {
-              noDataRanges.push([gapStart, gapEnd]);
+      
+          // 2) Stretches where the pollutant has no usable value (y === null)
+          let currentGapStartMs = null;
+          for (let i = 0; i < points.length; i++) {
+            const p   = points[i];
+            const tMs = Date.parse(p.x);
+      
+            if (p.y == null) {
+              if (currentGapStartMs === null) currentGapStartMs = tMs;
+            } else if (currentGapStartMs !== null) {
+              noDataRanges.push([currentGapStartMs, tMs]);
+              currentGapStartMs = null;
             }
           }
+          if (currentGapStartMs !== null) {
+            noDataRanges.push([currentGapStartMs, lastTimeMs]);
+          }
+      
+          // 3) From the last point to the right edge of the 24-h window
+          if (lastTimeMs < tMax) {
+            noDataRanges.push([lastTimeMs, tMax]);
+          }
+      
+          // 4) If there is *no numeric data at all* for this pollutant, shade the whole window
+          if (!numeric.length) {
+            noDataRanges.length = 0;
+            noDataRanges.push([tMin, tMax]);
+          }
         }
-    
-        // 5) If there is *no numeric data at all* for this pollutant, shade the whole window
-        if (!numeric.length) {
-          noDataRanges.length = 0;
-          noDataRanges.push([tMin, tMax]);
-        }
-      }
-
-
 
   /* ----- (Re)draw -------------------------------------------------------- */
   chart?.destroy();
