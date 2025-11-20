@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CCAS Dashboard – Power Cycling & Data Accuracy</title>
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=20251029" />
+
+  <!-- Minimal fallback to keep layout readable if css/style.css is missing (no header/nav styles) -->
+  <style>
+    :root{--brand:#004b8d;--text:#fff;--radius:6px;}
+    body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
+    main{flex:1;padding:1rem;max-width:900px;margin:auto;}
+
+    /* a11y fallback: show on focus */
+    .skip-link{position:absolute;left:-999px;top:auto;background:var(--brand);color:var(--text);padding:.5rem 1rem;z-index:100;}
+    .skip-link:focus{left:0;}
+
+    /* page-specific – selectors row */
+    .selectors{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1rem;}
+    .selectors select{padding:.6rem 1rem;font-size:1rem;border-radius:var(--radius);}   
+    canvas{max-width:100%;}
+
+    footer{padding:1rem;text-align:center;font-size:.9rem;color:#666;}
+  </style>
+
+</head>
