@@ -3,27 +3,122 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>CCAS Dashboard – Power Cycling & Data Accuracy</title>
+  <title>CCAS Dashboard – Info</title>
 
-  <!-- Shared stylesheet -->
+  <!-- Main stylesheet -->
   <link rel="stylesheet" href="css/style.css?v=20251029" />
-
-  <!-- Minimal fallback to keep layout readable if css/style.css is missing (no header/nav styles) -->
+  
+  <!-- Page-specific (minimal) -->
   <style>
-    :root{--brand:#004b8d;--text:#fff;--radius:6px;}
-    body{margin:0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;}
-    main{flex:1;padding:1rem;max-width:900px;margin:auto;}
+    /* Constrain and center the article content on this page only */
+    main.info { padding: 1rem; max-width: 900px; margin: auto; line-height: 1.7; }
+    main.info h2 { margin-top: 2rem; }
 
-    /* a11y fallback: show on focus */
-    .skip-link{position:absolute;left:-999px;top:auto;background:var(--brand);color:var(--text);padding:.5rem 1rem;z-index:100;}
-    .skip-link:focus{left:0;}
+    /* Optional: nicer spacing for collapsibles on the Info page */
+    main.info details { margin-top: .5rem; }
+    main.info details > summary { cursor: pointer; }
+    
+    /* Smooth in-page scrolling (optional but nice) */
+    html { scroll-behavior: smooth; }
+    
+    /* Header height → used for anchor offset */
+    :root { --header-offset: 64px; } /* default; JS below will auto-measure */
+    
+    /* Make anchored elements stop *below* the sticky header */
+    main.info h2[id],
+    main.info h3[id],
+    main.info section[id],
+    main.info details[id]{
+      scroll-margin-top: calc(var(--header-offset) + 8px);
+    }
 
-    /* page-specific – selectors row */
-    .selectors{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1rem;}
-    .selectors select{padding:.6rem 1rem;font-size:1rem;border-radius:var(--radius);}   
-    canvas{max-width:100%;}
+    /* Keep the opened dropdown from making the whole page huge on mobile */
+    @media (max-width: 1080px) {
+      /* The container that holds the table when the details is open */
+      #what-is-the-scale-for-the-aqhi[open] .aqhi-panel{
+        max-height: 70vh;              /* cap height to the viewport */
+        overflow: auto;                /* scroll inside the panel */
+        margin: .5rem 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        -webkit-overflow-scrolling: touch; /* smoother iOS scroll */
+      }
+    
+      /* Horizontal scroll if table is wider than the screen */
+      #what-is-the-scale-for-the-aqhi .aqhi-xscroll{
+        overflow-x: auto;
+      }
+    }
 
-    footer{padding:1rem;text-align:center;font-size:.9rem;color:#666;}
   </style>
-
 </head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">CCAS Dashboard</a>
+
+    <button class="hamburger" aria-controls="site-nav" aria-expanded="false">
+      <span class="visually-hidden">Menu</span>☰
+    </button>
+
+    <nav id="site-nav" class="nav">
+      <a class="nav-button" href="index.html">Home</a>
+      <a class="nav-button" href="map.html">Map</a>
+      <a class="nav-button" href="details.html">Graphs</a>
+      <a class="nav-button" href="list.html">Sensor&nbsp;List</a>
+      <a class="nav-button" href="info.html" aria-current="page">Info</a>
+    </nav>
+  </header>
+
+  <main id="main" class="info">
+
+  </main>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const header = document.querySelector('.site-header');
+  
+      function setOffsetVar() {
+        const h = header ? header.offsetHeight : 0;
+        document.documentElement.style.setProperty('--header-offset', h + 'px');
+      }
+  
+      function openDetailsAndAlign(hash) {
+        if (!hash) return;
+        const id = hash.slice(1);
+        const el = document.getElementById(id);
+        if (!el) return;
+  
+        // If target is inside a <details>, open it first
+        const d = el.closest('details');
+        if (d && !d.open) d.open = true;
+  
+        // Re-scroll so scroll-margin-top applies after opening
+        requestAnimationFrame(() => el.scrollIntoView({ block: 'start' }));
+      }
+  
+      // Initial measure + on resize (header height can change on mobile)
+      setOffsetVar();
+      window.addEventListener('resize', setOffsetVar, { passive: true });
+  
+      // If the page loads with a hash, fix it
+      if (location.hash) openDetailsAndAlign(location.hash);
+  
+      // Handle in-page anchor clicks / hash changes
+      window.addEventListener('hashchange', () => openDetailsAndAlign(location.hash));
+    });
+  </script>
+
+  <footer class="site-footer">
+    © 2025 Community Clean Air Spaces Study – University of British Columbia
+  </footer>
+
+  <!-- Hamburger toggle -->
+  <script src="js/menu.js" defer></script>
+
+</body>
+</html>
