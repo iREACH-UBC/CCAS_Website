@@ -56,6 +56,37 @@ function keyVal(s,key){
   }
 }
 
+/* derive display state for each sensor reading */
+function deriveStatus(aqhi, primary, pollutants = {}) {
+  const values = Object.values(pollutants);
+
+  // "Has data" means at least one finite numeric concentration
+  const hasAnyPollutant = values.some(v => {
+    if (v == null) return false;
+    const n = (typeof v === 'number') ? v : Number(v);
+    return Number.isFinite(n);
+  });
+
+  let mode = 'normal';
+  let displayPrimary = primary ?? '—';
+  const displayAQHI = aqhi;
+
+  if (!hasAnyPollutant) {
+    // No concentrations at all → treat as offline
+    mode = 'offline';
+    displayPrimary = 'Sensor Offline';
+  } else if (
+    aqhi == null || aqhi === '' ||
+    primary == null || primary === '' || primary === '—'
+  ) {
+    // Some pollutant data, but AQHI or primary missing → warming up
+    mode = 'warming';
+    displayPrimary = 'Sensor Warming Up';
+  }
+
+  return { mode, displayPrimary, displayAQHI };
+}
+
 /* Try to attach a concentration to the declared primary pollutant */
 const norm = s => (s ?? '').toString().toLowerCase().replace(/[^a-z0-9]/g,'');
 function primaryReading(primaryLabel, pollutants){
@@ -74,35 +105,54 @@ function primaryReading(primaryLabel, pollutants){
 /* ---------- desktop rows (now with date) ---------------------------- */
 function buildRowsDesktop(sensor){
   const { name='—' } = sensor;
-  const { aqhi=null, primary='—', pollutants={}, timestamp=null } = sensor.latest ?? {};
+  const { aqhi=null, primary:nullPrimary=null, pollutants={}, timestamp=null } = sensor.latest ?? {};
+
+  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants);
   const lastSeen = fmtTS(timestamp, true); // include date+time on desktop
 
   const row = document.createElement('tr');
   row.className='sensor-row';
   row.innerHTML=`
     <td>${name}</td>
-    <td style="background:${colourForAQHI(aqhi)};color:#fff;text-align:center;">${aqhi??'—'}</td>
-    <td>${primary}</td>
+    <td style="background:${colourForAQHI(displayAQHI)};color:#fff;text-align:center;">${displayAQHI ?? '—'}</td>
+    <td>${displayPrimary}</td>
     <td>${lastSeen}</td>`;
 
   const detail=document.createElement('tr');
   detail.className='sensor-detail';
   detail.style.display='none';
   detail.innerHTML=`<td colspan="4" class="detail-cell">
-      <strong>AQHI:</strong> ${aqhi??'—'} (${aqhiBand(aqhi)} risk)<br>
-      <strong>Main Contributor:</strong> ${primary}
+      <strong>AQHI:</strong> ${displayAQHI ?? '—'} (${aqhiBand(displayAQHI)} risk)<br>
+      <strong>Main Contributor:</strong> ${displayPrimary}
       <table class="poll-table">
         <thead><tr><th>Pollutant</th><th>Conc.</th><th>Status</th></tr></thead>
         <tbody>
-          ${Object.entries(META).map(([k,{name,unit,info,low,med}])=>{
-            const val=pollutants[k];
-            const status=val==null?'—':val<=low?'Low':val<=med?'Moderate':'High';
-            return`<tr>
-              <td title="${info}">${name}</td>
-              <td>${fmt(val,k==='pm25'?1:2)} ${unit}</td>
-              <td>${status}</td>
-            </tr>`;
-          }).join('')}
+          ${
+            Object.entries(META).map(([k,{name,unit,info,low,med}])=>{
+              const raw = pollutants[k];
+              let val = raw == null ? null : Number(raw);
+              if (!Number.isFinite(val)) val = null;
+
+              // If offline, suppress all concentrations and statuses
+              if (mode === 'offline') {
+                val = null;
+              }
+
+              const status = (mode === 'offline')
+                ? '—'
+                : (val == null ? '—' : (val <= low ? 'Low' : (val <= med ? 'Moderate' : 'High')));
+
+              const conc = (val == null)
+                ? '—'
+                : `${val.toFixed(k === 'pm25' ? 1 : 2)} ${unit}`;
+
+              return `<tr>
+                <td title="${info}">${name}</td>
+                <td>${conc}</td>
+                <td>${status}</td>
+              </tr>`;
+            }).join('')
+          }
         </tbody>
       </table>
     </td>`;
@@ -111,12 +161,19 @@ function buildRowsDesktop(sensor){
   return [row,detail];
 }
 
+
 /* ---------- mobile card -------------------------------------------- */
 function buildCard(sensor){
   const { name='—' } = sensor;
-  const { aqhi=null, primary='—', pollutants={}, timestamp=null } = sensor.latest ?? {};
-  const conc = primaryReading(primary, pollutants) ?? '—';
+  const { aqhi=null, primary:nullPrimary=null, pollutants={}, timestamp=null } = sensor.latest ?? {};
+
+  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants);
   const last = fmtTS(timestamp, true);
+
+  // For "Sensor Offline", we force conc to '—'
+  const conc = (mode === 'offline')
+    ? '—'
+    : (primaryReading(displayPrimary, pollutants) ?? '—');
 
   const card = document.createElement('article');
   card.className='sensor-card';
@@ -127,27 +184,43 @@ function buildCard(sensor){
   card.innerHTML = `
     <div class="sensor-card__left">
       <h3 class="sensor-card__title">${name}</h3>
-      <div class="sensor-card__meta"><strong>${primary}</strong> · ${conc}</div>
+      <div class="sensor-card__meta"><strong>${displayPrimary}</strong> · ${conc}</div>
       <div class="sensor-card__meta">Last seen: ${last}</div>
     </div>
     <div class="sensor-card__right">
-      <div class="sensor-card__aqhi" style="background:${colourForAQHI(aqhi)}">${aqhi ?? '—'}</div>
+      <div class="sensor-card__aqhi" style="background:${colourForAQHI(displayAQHI)}">${displayAQHI ?? '—'}</div>
     </div>
     <div class="sensor-card__detail">
-      <div><strong>AQHI:</strong> ${aqhi??'—'} (${aqhiBand(aqhi)} risk)</div>
-      <div><strong>Main Contributor:</strong> ${primary}</div>
+      <div><strong>AQHI:</strong> ${displayAQHI ?? '—'} (${aqhiBand(displayAQHI)} risk)</div>
+      <div><strong>Main Contributor:</strong> ${displayPrimary}</div>
       <table class="poll-table" style="margin-top:.6rem">
         <thead><tr><th>Pollutant</th><th>Conc.</th><th>Status</th></tr></thead>
         <tbody>
-          ${Object.entries(META).map(([k,{name,unit,info,low,med}])=>{
-            const val=pollutants[k];
-            const status=val==null?'—':val<=low?'Low':val<=med?'Moderate':'High';
-            return`<tr>
-              <td title="${info}">${name}</td>
-              <td>${fmt(val,k==='pm25'?1:2)} ${unit}</td>
-              <td>${status}</td>
-            </tr>`;
-          }).join('')}
+          ${
+            Object.entries(META).map(([k,{name,unit,info,low,med}])=>{
+              const raw = pollutants[k];
+              let val = raw == null ? null : Number(raw);
+              if (!Number.isFinite(val)) val = null;
+
+              if (mode === 'offline') {
+                val = null;
+              }
+
+              const status = (mode === 'offline')
+                ? '—'
+                : (val == null ? '—' : (val <= low ? 'Low' : (val <= med ? 'Moderate' : 'High')));
+
+              const conc = (val == null)
+                ? '—'
+                : `${val.toFixed(k === 'pm25' ? 1 : 2)} ${unit}`;
+
+              return `<tr>
+                <td title="${info}">${name}</td>
+                <td>${conc}</td>
+                <td>${status}</td>
+              </tr>`;
+            }).join('')
+          }
         </tbody>
       </table>
     </div>
@@ -162,6 +235,7 @@ function buildCard(sensor){
 
   return card;
 }
+
 
 /* ---------- render (switches view) ---------------------------------- */
 function render(){
