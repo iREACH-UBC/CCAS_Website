@@ -15,8 +15,11 @@ function colourForAQHI(a){
   if (a<=9)  return '#bf2733';
   return '#8b2328';
 }
+
 const fmt      =(x,d=2)=> x==null ? '—' : Number(x).toFixed(d);
+
 const aqhiBand = v=> v==null ? '—' : v<=3 ? 'Low' : v<=6 ? 'Moderate' : v<=10? 'High' : 'Very High';
+
 const fmtTS = (ts, withDate) => {
   if (!ts) return '—';
   const d = new Date(ts);
@@ -24,6 +27,8 @@ const fmtTS = (ts, withDate) => {
     ? d.toLocaleString(undefined,{ year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
     : d.toLocaleTimeString(undefined,{ hour:'2-digit', minute:'2-digit', hour12:false });
 };
+
+const MAX_AGE_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 /* pollutant meta for detail table */
 const META={
@@ -57,7 +62,7 @@ function keyVal(s,key){
 }
 
 /* derive display state for each sensor reading */
-function deriveStatus(aqhi, primary, pollutants = {}) {
+function deriveStatus(aqhi, primary, pollutants = {}, timestamp) {
   const values = Object.values(pollutants);
 
   // "Has data" means at least one finite numeric concentration
@@ -67,12 +72,23 @@ function deriveStatus(aqhi, primary, pollutants = {}) {
     return Number.isFinite(n);
   });
 
+  // Staleness: no timestamp, or older than MAX_AGE_MS
+  let isStale = false;
+  if (!timestamp) {
+    isStale = true;
+  } else {
+    const t = new Date(timestamp).getTime();
+    if (!Number.isNaN(t)) {
+      isStale = (Date.now() - t) > MAX_AGE_MS;
+    }
+  }
+
   let mode = 'normal';
   let displayPrimary = primary ?? '—';
   const displayAQHI = aqhi;
 
-  if (!hasAnyPollutant) {
-    // No concentrations at all → treat as offline
+  if (isStale || !hasAnyPollutant) {
+    // Offline if stale timestamp OR no concentrations (previous behaviour preserved)
     mode = 'offline';
     displayPrimary = 'Sensor Offline';
   } else if (
@@ -86,6 +102,7 @@ function deriveStatus(aqhi, primary, pollutants = {}) {
 
   return { mode, displayPrimary, displayAQHI };
 }
+
 
 /* Try to attach a concentration to the declared primary pollutant */
 const norm = s => (s ?? '').toString().toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -107,7 +124,7 @@ function buildRowsDesktop(sensor){
   const { name='—' } = sensor;
   const { aqhi=null, primary:nullPrimary=null, pollutants={}, timestamp=null } = sensor.latest ?? {};
 
-  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants);
+  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants, timestamp);
   const lastSeen = fmtTS(timestamp, true); // include date+time on desktop
 
   const row = document.createElement('tr');
@@ -117,7 +134,7 @@ function buildRowsDesktop(sensor){
     <td style="background:${colourForAQHI(displayAQHI)};color:#fff;text-align:center;">${displayAQHI ?? '—'}</td>
     <td>${displayPrimary}</td>
     <td>${lastSeen}</td>`;
-
+    
   const detail=document.createElement('tr');
   detail.className='sensor-detail';
   detail.style.display='none';
@@ -167,10 +184,9 @@ function buildCard(sensor){
   const { name='—' } = sensor;
   const { aqhi=null, primary:nullPrimary=null, pollutants={}, timestamp=null } = sensor.latest ?? {};
 
-  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants);
+  const { mode, displayPrimary, displayAQHI } = deriveStatus(aqhi, nullPrimary, pollutants, timestamp);
   const last = fmtTS(timestamp, true);
 
-  // For "Sensor Offline", we force conc to '—'
   const conc = (mode === 'offline')
     ? '—'
     : (primaryReading(displayPrimary, pollutants) ?? '—');
