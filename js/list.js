@@ -85,7 +85,7 @@ function deriveStatus(aqhi, primary, pollutants = {}, timestamp) {
 
   let mode = 'normal';
   let displayPrimary = primary ?? '—';
-  const displayAQHI = aqhi;
+  let displayAQHI = aqhi;
 
   if (isStale || !hasAnyPollutant) {
     // Offline if stale timestamp OR no concentrations (previous behaviour preserved)
