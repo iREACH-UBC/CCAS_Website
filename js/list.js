@@ -91,6 +91,7 @@ function deriveStatus(aqhi, primary, pollutants = {}, timestamp) {
     // Offline if stale timestamp OR no concentrations (previous behaviour preserved)
     mode = 'offline';
     displayPrimary = 'Sensor Offline';
+    displayAQHI = null;
   } else if (
     aqhi == null || aqhi === '' ||
     primary == null || primary === '' || primary === '—'
