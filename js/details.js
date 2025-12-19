@@ -365,37 +365,40 @@ async function drawChart () {
           grid: { color: 'rgba(0,0,0,.06)' },
           ticks: {
             callback: (v, i, ticks) => {
-              const vals = ticks
-                .map(t => (t && typeof t === "object" ? t.value : t))
-                .filter(x => typeof x === "number" && Number.isFinite(x));
-          
-              // Smallest non-zero spacing between consecutive ticks
+              const arr = Array.isArray(ticks) ? ticks : [];
+        
+              // Coerce tick values to numbers (Chart.js may provide strings or tick objects)
+              const vals = arr
+                .map(t => Number((t && typeof t === 'object') ? t.value : t))
+                .filter(n => Number.isFinite(n))
+                .sort((a, b) => a - b);
+        
+              // Smallest non-zero spacing
               let minStep = Infinity;
               for (let j = 1; j < vals.length; j++) {
                 const d = Math.abs(vals[j] - vals[j - 1]);
                 if (d > 0 && d < minStep) minStep = d;
               }
-          
-              // Decimals implied by step (0.05 -> 2, 0.1 -> 1, 1 -> 0), capped at 2
-              const stepDecimals = Number.isFinite(minStep)
+        
+              const hasStep = Number.isFinite(minStep) && minStep !== Infinity;
+
+              const stepDecimals = hasStep
                 ? Math.min(2, Math.max(0, Math.ceil(-Math.log10(minStep + Number.EPSILON))))
                 : 0;
-          
-              // Optional: keep your original readability rule as a floor
-              const magDecimals = Math.abs(v) < 10 ? 1 : 0;
-          
-              const digits = Math.max(stepDecimals, magDecimals);
-          
+              
+              const fallback = Math.abs(v) < 10 ? 1 : 0;
+              const digits   = hasStep ? Math.max(stepDecimals, fallback) : fallback;
+
+        
               return Number(v).toLocaleString(undefined, {
                 minimumFractionDigits: digits,
-                maximumFractionDigits: digits,
+                maximumFractionDigits: digits
               });
             }
-          }
-
           },
           title: { display: true, text: `${pollutantSel.value} (${UNITS[pollutantSel.value]})` }
         }
+
       }
     },
     // NEW: include the gap-shading plugin
