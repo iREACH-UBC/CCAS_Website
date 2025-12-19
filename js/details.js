@@ -364,11 +364,35 @@ async function drawChart () {
           suggestedMax: maxY * 1.1,
           grid: { color: 'rgba(0,0,0,.06)' },
           ticks: {
-            callback: (v) => {
-              // Round sensibly for readability
-              const digits = Math.abs(v) < 10 ? 1 : 0;
-              return Number(v).toLocaleString(undefined, { maximumFractionDigits: digits });
+            callback: (v, i, ticks) => {
+              const vals = ticks
+                .map(t => (t && typeof t === "object" ? t.value : t))
+                .filter(x => typeof x === "number" && Number.isFinite(x));
+          
+              // Smallest non-zero spacing between consecutive ticks
+              let minStep = Infinity;
+              for (let j = 1; j < vals.length; j++) {
+                const d = Math.abs(vals[j] - vals[j - 1]);
+                if (d > 0 && d < minStep) minStep = d;
+              }
+          
+              // Decimals implied by step (0.05 -> 2, 0.1 -> 1, 1 -> 0), capped at 2
+              const stepDecimals = Number.isFinite(minStep)
+                ? Math.min(2, Math.max(0, Math.ceil(-Math.log10(minStep + Number.EPSILON))))
+                : 0;
+          
+              // Optional: keep your original readability rule as a floor
+              const magDecimals = Math.abs(v) < 10 ? 1 : 0;
+          
+              const digits = Math.max(stepDecimals, magDecimals);
+          
+              return Number(v).toLocaleString(undefined, {
+                minimumFractionDigits: digits,
+                maximumFractionDigits: digits,
+              });
             }
+          }
+
           },
           title: { display: true, text: `${pollutantSel.value} (${UNITS[pollutantSel.value]})` }
         }
