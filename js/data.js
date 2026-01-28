@@ -40,3 +40,10 @@ export async function getSensorData({ force = false, maxAgeMs = DEFAULT_MAX_AGE_
   _cacheTimeMs = now;
   return _cache;
 }
+
+export async function getActiveAlertSensors (opts = {}) {
+  const json = await getSensorData(opts);
+  const sensors = json?.sensors ?? [];
+  return sensors.filter(s => s?.active_alert);
+}
+
