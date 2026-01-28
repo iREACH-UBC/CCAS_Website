@@ -59,10 +59,15 @@
   <!-- Hamburger toggle script -->
   <script src="js/menu.js" defer></script>
   
-  <!-- near the end of <body>, after your header markup -->
+  <!-- mounts the AQ alerts -->
   <script type="module">
     import { mountAqAlertBanner } from './js/alerts-banner.js';
-    document.addEventListener('DOMContentLoaded', mountAqAlertBanner);
+  
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountAqAlertBanner);
+    } else {
+      mountAqAlertBanner();
+    }
   </script>
 
 </body>
