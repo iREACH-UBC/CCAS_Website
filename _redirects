@@ -2,4 +2,4 @@
 /css/*          /css/:splat     200
 /js/*           /js/:splat      200
 /img/*          /img/:splat     200
-/*              /offline.html   302!
+# /*              /offline.html   302!
