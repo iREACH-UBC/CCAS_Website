@@ -11,7 +11,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-/* ── AQHI colour helper ──────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────────── */
+
 function getAQHIColor(aqhi) {
   if (aqhi <= 1) return '#67c1f1';
   if (aqhi <= 2) return '#4e95c7';
@@ -25,180 +26,323 @@ function getAQHIColor(aqhi) {
   return '#8b2328';
 }
 
-/* ── Primary pollutant helpers ───────────────────────────────────── */
-function normalizeSubscripts(str) {
-  const subscriptMap = {
-    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
-    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'
-  };
+function colorFromBins(value, bins, colors) {
+  if (value == null || Number.isNaN(Number(value))) return '#9aa0a6';
+  const v = Number(value);
 
-  return String(str ?? '').replace(/[₀₁₂₃₄₅₆₇₈₉]/g, ch => subscriptMap[ch] || ch);
+  for (let i = 0; i < bins.length; i++) {
+    if (v <= bins[i]) return colors[i];
+  }
+  return colors[colors.length - 1];
 }
 
-function canonicalPollutant(primary) {
-  const raw = normalizeSubscripts(primary).toUpperCase().replace(/\s+/g, '');
-
-  if (!raw) return null;
-  if (raw.includes('PM2.5') || raw.includes('PM25') || raw.includes('PM2_5')) return 'PM2.5';
-  if (raw.includes('PM10')) return 'PM10';
-  if (raw.includes('PM1.0') || raw.includes('PM1_0') || raw === 'PM1') return 'PM1.0';
-  if (raw === 'O3' || raw.includes('OZONE')) return 'O3';
-  if (raw === 'NO2' || raw.includes('NITROGENDIOXIDE')) return 'NO2';
-  if (raw === 'NO') return 'NO';
-  if (raw === 'CO2') return 'CO2';
-  if (raw === 'CO' || raw.includes('CARBONMONOXIDE')) return 'CO';
-
-  return normalizeSubscripts(primary);
+function formatNumber(value, digits = 1) {
+  if (value == null || Number.isNaN(Number(value))) return '—';
+  return Number(value).toFixed(digits);
 }
 
-function getPollutantUnit(primary) {
-  switch (canonicalPollutant(primary)) {
-    case 'PM2.5':
-    case 'PM10':
-    case 'PM1.0':
+function getPollutantUnit(key) {
+  switch (key) {
+    case 'pm25':
       return 'µg/m³';
-    case 'O3':
-    case 'NO2':
-    case 'NO':
+    case 'o3':
+    case 'no2':
+    case 'no':
       return 'ppb';
-    case 'CO':
-    case 'CO2':
+    case 'co':
+    case 'co2':
       return 'ppm';
     default:
       return '';
   }
 }
 
-function getPrimaryConcentration(latest, primary) {
-  const canon = canonicalPollutant(primary);
-  if (!canon) return null;
+function canonicalPollutantName(name) {
+  const raw = String(name ?? '').trim().toUpperCase();
+  if (!raw) return null;
+  if (raw === 'PM2.5' || raw === 'PM25' || raw === 'PM2_5') return 'pm25';
+  if (raw === 'O3') return 'o3';
+  if (raw === 'NO2') return 'no2';
+  if (raw === 'NO') return 'no';
+  if (raw === 'CO') return 'co';
+  if (raw === 'CO2') return 'co2';
+  return raw.toLowerCase();
+}
 
-  const generic =
-    latest.primary_concentration ??
-    latest.primary_value ??
-    latest.primary_conc ??
-    latest.primaryConc ??
-    latest.primaryValue ??
-    null;
-
-  if (generic != null && !Number.isNaN(Number(generic))) {
-    return generic;
+function displayPollutantName(key) {
+  switch (key) {
+    case 'pm25': return 'PM2.5';
+    case 'o3': return 'O3';
+    case 'no2': return 'NO2';
+    case 'no': return 'NO';
+    case 'co': return 'CO';
+    case 'co2': return 'CO2';
+    default: return key ?? '—';
   }
+}
 
-  switch (canon) {
-    case 'PM2.5':
-      return latest.pm25 ?? latest.pm2_5 ?? latest.pm2p5 ?? latest['PM2.5'] ?? latest['PM2_5'] ?? latest['PM25'] ?? null;
-    case 'PM10':
-      return latest.pm10 ?? latest['PM10'] ?? null;
-    case 'PM1.0':
-      return latest.pm1 ?? latest.pm1_0 ?? latest.pm1p0 ?? latest['PM1.0'] ?? latest['PM1_0'] ?? null;
-    case 'O3':
-      return latest.o3 ?? latest['O3'] ?? null;
-    case 'NO2':
-      return latest.no2 ?? latest['NO2'] ?? null;
-    case 'NO':
-      return latest.no ?? latest['NO'] ?? null;
-    case 'CO':
-      return latest.co ?? latest['CO'] ?? null;
-    case 'CO2':
-      return latest.co2 ?? latest['CO2'] ?? null;
-    default:
-      return null;
-  }
+function getPollutantValue(latest, key) {
+  const pollutants = latest?.pollutants ?? {};
+  return pollutants[key] ?? null;
 }
 
 function formatPrimaryPollutant(latest) {
-  const rawPrimary =
-    latest.primary ??
-    latest.primary_pollutant ??
-    latest.primaryPollutant ??
-    null;
+  const primaryKey = canonicalPollutantName(
+    latest?.primary ?? latest?.primary_pollutant ?? latest?.primaryPollutant
+  );
 
-  if (!rawPrimary) return 'Primary Pollutant: —';
+  if (!primaryKey) return 'Primary Pollutant: —';
 
-  const primary = canonicalPollutant(rawPrimary);
-  const concentration = getPrimaryConcentration(latest, rawPrimary);
+  const value = getPollutantValue(latest, primaryKey);
+  const unit = getPollutantUnit(primaryKey);
+  const label = displayPollutantName(primaryKey);
 
-  if (concentration == null || Number.isNaN(Number(concentration))) {
-    return `Primary Pollutant: ${primary}`;
+  if (value == null || Number.isNaN(Number(value))) {
+    return `Primary Pollutant: ${label}`;
   }
 
-  const unit = getPollutantUnit(primary);
-  return `Primary Pollutant: ${primary} (${Number(concentration).toFixed(1)} ${unit})`;
+  return `Primary Pollutant: ${label} (${formatNumber(value)} ${unit})`;
 }
 
-/* ── Legend ──────────────────────────────────────────────────────── */
+/* ── Layer configs ───────────────────────────────────────────────── */
+
+const pollutantScaleColors = [
+  '#67c1f1',
+  '#4e95c7',
+  '#396798',
+  '#e7eb38',
+  '#f1cb2e',
+  '#dd6869'
+];
+
+const LAYER_CONFIG = {
+  aqhi: {
+    label: 'AQHI',
+    getValue: latest => latest?.aqhi ?? null,
+    getColor: value => getAQHIColor(value),
+    legendRows: [
+      { color: getAQHIColor(1), label: '1–3', band: 'Low' },
+      { color: getAQHIColor(4), label: '4–6', band: 'Moderate' },
+      { color: getAQHIColor(7), label: '7–9', band: 'High' },
+      { color: getAQHIColor(10.5), label: '10+', band: 'Very High' }
+    ],
+    note: ''
+  },
+
+  pm25: {
+    label: 'PM2.5',
+    getValue: latest => getPollutantValue(latest, 'pm25'),
+    getColor: value => colorFromBins(value, [5, 10, 20, 35, 55], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–5', band: 'µg/m³' },
+      { color: pollutantScaleColors[1], label: '5–10', band: 'µg/m³' },
+      { color: pollutantScaleColors[2], label: '10–20', band: 'µg/m³' },
+      { color: pollutantScaleColors[3], label: '20–35', band: 'µg/m³' },
+      { color: pollutantScaleColors[4], label: '35–55', band: 'µg/m³' },
+      { color: pollutantScaleColors[5], label: '55+', band: 'µg/m³' }
+    ],
+    note: 'Example scale'
+  },
+
+  o3: {
+    label: 'O3',
+    getValue: latest => getPollutantValue(latest, 'o3'),
+    getColor: value => colorFromBins(value, [20, 40, 60, 80, 100], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–20', band: 'ppb' },
+      { color: pollutantScaleColors[1], label: '20–40', band: 'ppb' },
+      { color: pollutantScaleColors[2], label: '40–60', band: 'ppb' },
+      { color: pollutantScaleColors[3], label: '60–80', band: 'ppb' },
+      { color: pollutantScaleColors[4], label: '80–100', band: 'ppb' },
+      { color: pollutantScaleColors[5], label: '100+', band: 'ppb' }
+    ],
+    note: 'Example scale'
+  },
+
+  no2: {
+    label: 'NO2',
+    getValue: latest => getPollutantValue(latest, 'no2'),
+    getColor: value => colorFromBins(value, [10, 20, 30, 50, 80], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–10', band: 'ppb' },
+      { color: pollutantScaleColors[1], label: '10–20', band: 'ppb' },
+      { color: pollutantScaleColors[2], label: '20–30', band: 'ppb' },
+      { color: pollutantScaleColors[3], label: '30–50', band: 'ppb' },
+      { color: pollutantScaleColors[4], label: '50–80', band: 'ppb' },
+      { color: pollutantScaleColors[5], label: '80+', band: 'ppb' }
+    ],
+    note: 'Example scale'
+  },
+
+  no: {
+    label: 'NO',
+    getValue: latest => getPollutantValue(latest, 'no'),
+    getColor: value => colorFromBins(value, [5, 10, 20, 40, 80], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–5', band: 'ppb' },
+      { color: pollutantScaleColors[1], label: '5–10', band: 'ppb' },
+      { color: pollutantScaleColors[2], label: '10–20', band: 'ppb' },
+      { color: pollutantScaleColors[3], label: '20–40', band: 'ppb' },
+      { color: pollutantScaleColors[4], label: '40–80', band: 'ppb' },
+      { color: pollutantScaleColors[5], label: '80+', band: 'ppb' }
+    ],
+    note: 'Example scale'
+  },
+
+  co: {
+    label: 'CO',
+    getValue: latest => getPollutantValue(latest, 'co'),
+    getColor: value => colorFromBins(value, [0.2, 0.4, 0.8, 1.5, 3], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–0.2', band: 'ppm' },
+      { color: pollutantScaleColors[1], label: '0.2–0.4', band: 'ppm' },
+      { color: pollutantScaleColors[2], label: '0.4–0.8', band: 'ppm' },
+      { color: pollutantScaleColors[3], label: '0.8–1.5', band: 'ppm' },
+      { color: pollutantScaleColors[4], label: '1.5–3', band: 'ppm' },
+      { color: pollutantScaleColors[5], label: '3+', band: 'ppm' }
+    ],
+    note: 'Example scale'
+  },
+
+  co2: {
+    label: 'CO2',
+    getValue: latest => getPollutantValue(latest, 'co2'),
+    getColor: value => colorFromBins(value, [500, 700, 900, 1200, 2000], pollutantScaleColors),
+    legendRows: [
+      { color: pollutantScaleColors[0], label: '0–500', band: 'ppm' },
+      { color: pollutantScaleColors[1], label: '500–700', band: 'ppm' },
+      { color: pollutantScaleColors[2], label: '700–900', band: 'ppm' },
+      { color: pollutantScaleColors[3], label: '900–1200', band: 'ppm' },
+      { color: pollutantScaleColors[4], label: '1200–2000', band: 'ppm' },
+      { color: pollutantScaleColors[5], label: '2000+', band: 'ppm' }
+    ],
+    note: 'Example scale'
+  }
+};
+
+/* ── Minimisable legend ──────────────────────────────────────────── */
+
 const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+let currentMode = 'aqhi';
+let legendCollapsed = false;
+let legendContainer = null;
 
-const aqhiLegend = L.control({
-  position: isDesktop ? 'topleft' : 'topright'
-});
+function renderLegend() {
+  if (!legendContainer) return;
 
-aqhiLegend.onAdd = function () {
-  const div = L.DomUtil.create('div', 'aqhi-legend');
-
-  const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10.5];
-  const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
-  const bands = [
-    'Low',
-    'Low',
-    'Low',
-    'Moderate',
-    'Moderate',
-    'Moderate',
-    'High',
-    'High',
-    'High',
-    'Very High'
-  ];
-
-  const rows = grades.map((g, i) => `
-    <div class="legend-row">
-      <span class="swatch" style="background:${getAQHIColor(g)}"></span>
-      <span class="legend-value">${labels[i]}</span>
-      <span class="legend-band">${bands[i]}</span>
-    </div>
-  `).join('');
-
-  div.innerHTML = `
-    <h4 class="legend-title">
-      <span class="legend-heading">AQHI</span>
+  const cfg = LAYER_CONFIG[currentMode];
+  const helpLink = currentMode === 'aqhi'
+    ? `
       <a class="legend-help"
          href="info.html#aqhi"
          aria-label="What is this colour scale? Learn more on the Info page.">
          What’s this?
       </a>
-    </h4>
-    <div class="legend-list" aria-label="AQHI risk categories">
-      ${rows}
+    `
+    : '<span></span>';
+
+  const rows = cfg.legendRows.map(row => `
+    <div class="legend-row">
+      <span class="swatch" style="background:${row.color}"></span>
+      <span class="legend-value">${row.label}</span>
+      <span class="legend-band">${row.band}</span>
+    </div>
+  `).join('');
+
+  legendContainer.classList.toggle('is-collapsed', legendCollapsed);
+  legendContainer.innerHTML = `
+    <div class="legend-title">
+      <button type="button"
+              class="legend-toggle"
+              aria-expanded="${String(!legendCollapsed)}"
+              aria-label="${legendCollapsed ? 'Expand legend' : 'Collapse legend'}">
+        ${legendCollapsed ? '▸' : '▾'} ${cfg.label}
+      </button>
+      ${helpLink}
+    </div>
+    <div class="legend-body">
+      <div class="legend-list" aria-label="${cfg.label} legend">
+        ${rows}
+      </div>
+      ${cfg.note ? `<div class="legend-note">${cfg.note}</div>` : ''}
     </div>
   `;
 
-  return div;
+  const btn = legendContainer.querySelector('.legend-toggle');
+  btn.addEventListener('click', () => {
+    legendCollapsed = !legendCollapsed;
+    renderLegend();
+  });
+}
+
+const legendControl = L.control({
+  position: isDesktop ? 'topleft' : 'bottomright'
+});
+
+legendControl.onAdd = function () {
+  legendContainer = L.DomUtil.create('div', 'aqhi-legend');
+  L.DomEvent.disableClickPropagation(legendContainer);
+  L.DomEvent.disableScrollPropagation(legendContainer);
+  renderLegend();
+  return legendContainer;
 };
 
-aqhiLegend.addTo(map);
+legendControl.addTo(map);
 
-/* ── Fetch JSON and add markers ──────────────────────────────────── */
+/* ── Data, markers, and layer switching ──────────────────────────── */
+
 getSensorData().then(({ sensors, generated_at }) => {
+  const layerGroups = {};
+  const baseLayers = {};
+  const layerToMode = new Map();
+
+  Object.entries(LAYER_CONFIG).forEach(([mode, cfg]) => {
+    const group = L.layerGroup();
+    layerGroups[mode] = group;
+    baseLayers[cfg.label] = group;
+    layerToMode.set(group, mode);
+  });
+
   sensors.forEach(sensor => {
     const { lat, lon, latest } = sensor;
     if (lat == null || lon == null) return;
 
-    console.log('PRIMARY DEBUG', sensor.name ?? sensor.id, latest.primary, latest);
-
-    const marker = L.circleMarker([lat, lon], {
-      color: getAQHIColor(latest.aqhi ?? 0),
-      radius: 8,
-      fillOpacity: 0.8
-    }).addTo(map);
-
-    marker.bindPopup(`
+    const popupHtml = `
       <b>${sensor.name ?? sensor.id}</b><br/>
-      AQHI: ${latest.aqhi ?? '—'}<br/>
+      AQHI: ${latest?.aqhi ?? '—'}<br/>
       ${formatPrimaryPollutant(latest)}<br/>
       <small>${new Date(generated_at).toLocaleString()}</small>
-    `);
+    `;
+
+    Object.entries(LAYER_CONFIG).forEach(([mode, cfg]) => {
+      const value = cfg.getValue(latest);
+      const color = cfg.getColor(value);
+
+      const marker = L.circleMarker([lat, lon], {
+        color,
+        fillColor: color,
+        fillOpacity: 0.85,
+        radius: 8,
+        weight: 1
+      });
+
+      marker.bindPopup(popupHtml);
+      marker.addTo(layerGroups[mode]);
+    });
+  });
+
+  layerGroups.aqhi.addTo(map);
+
+  L.control.layers(baseLayers, null, {
+    collapsed: false,
+    position: 'topright'
+  }).addTo(map);
+
+  map.on('baselayerchange', e => {
+    const mode = layerToMode.get(e.layer);
+    if (!mode) return;
+    currentMode = mode;
+    renderLegend();
   });
 
   document.title += ` – updated ${new Date(generated_at).toLocaleTimeString()}`;
