@@ -276,7 +276,7 @@ function renderLegend() {
 }
 
 const legendControl = L.control({
-  position: isDesktop ? 'topleft' : 'bottomright'
+  position: isDesktop ? 'topleft' : 'topright'
 });
 
 legendControl.onAdd = function () {
