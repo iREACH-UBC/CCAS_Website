@@ -285,9 +285,15 @@
         getValue: latest => latest?.aqhi ?? null,
         getColor: value => getAQHIColor(value),
         legendRows: [
-          { color: getAQHIColor(1), label: '1–3', band: 'Low' },
-          { color: getAQHIColor(4), label: '4–6', band: 'Moderate' },
-          { color: getAQHIColor(7), label: '7–9', band: 'High' },
+          { color: getAQHIColor(1), label: '1', band: 'Low' },
+          { color: getAQHIColor(2), label: '2', band: 'Low' },
+          { color: getAQHIColor(3), label: '3', band: 'Low' },
+          { color: getAQHIColor(4), label: '4', band: 'Moderate' },
+          { color: getAQHIColor(5), label: '5', band: 'Moderate' },
+          { color: getAQHIColor(6), label: '6', band: 'Moderate' },
+          { color: getAQHIColor(7), label: '7', band: 'High' },
+          { color: getAQHIColor(8), label: '8', band: 'High' },
+          { color: getAQHIColor(9), label: '9', band: 'High' },
           { color: getAQHIColor(10.5), label: '10+', band: 'Very High' }
         ],
         note: ''
@@ -296,46 +302,45 @@
       pm25: {
         label: 'PM2.5',
         getValue: latest => getPollutantValue(latest, 'pm25'),
-        getColor: value => colorFromBins(value, [5, 10, 20, 35, 55], pollutantScaleColors),
+        getColor: value => colorFromBins(value, [5, 15, 25, 35, 55], pollutantScaleColors),
         legendRows: [
-          { color: pollutantScaleColors[0], label: '0–5', band: 'µg/m³' },
-          { color: pollutantScaleColors[1], label: '5–10', band: 'µg/m³' },
-          { color: pollutantScaleColors[2], label: '10–20', band: 'µg/m³' },
-          { color: pollutantScaleColors[3], label: '20–35', band: 'µg/m³' },
+          { color: pollutantScaleColors[0], label: '0-5', band: 'µg/m³' },
+          { color: pollutantScaleColors[1], label: '5–15', band: 'µg/m³' },
+          { color: pollutantScaleColors[2], label: '15–25', band: 'µg/m³' },
+          { color: pollutantScaleColors[3], label: '25–35', band: 'µg/m³' },
           { color: pollutantScaleColors[4], label: '35–55', band: 'µg/m³' },
           { color: pollutantScaleColors[5], label: '55+', band: 'µg/m³' }
         ],
-        note: 'Example scale'
+        note: ''
       },
 
       o3: {
         label: 'O3',
         getValue: latest => getPollutantValue(latest, 'o3'),
-        getColor: value => colorFromBins(value, [20, 40, 60, 80, 100], pollutantScaleColors),
+        getColor: value => colorFromBins(value, [40, 50, 60, 80, 100], pollutantScaleColors),
         legendRows: [
-          { color: pollutantScaleColors[0], label: '0–20', band: 'ppb' },
-          { color: pollutantScaleColors[1], label: '20–40', band: 'ppb' },
-          { color: pollutantScaleColors[2], label: '40–60', band: 'ppb' },
+          { color: pollutantScaleColors[0], label: '0–40', band: 'ppb' },
+          { color: pollutantScaleColors[1], label: '40–50', band: 'ppb' },
+          { color: pollutantScaleColors[2], label: '50–60', band: 'ppb' },
           { color: pollutantScaleColors[3], label: '60–80', band: 'ppb' },
           { color: pollutantScaleColors[4], label: '80–100', band: 'ppb' },
           { color: pollutantScaleColors[5], label: '100+', band: 'ppb' }
         ],
-        note: 'Example scale'
+        note: ''
       },
 
       no2: {
         label: 'NO2',
         getValue: latest => getPollutantValue(latest, 'no2'),
-        getColor: value => colorFromBins(value, [10, 20, 30, 50, 80], pollutantScaleColors),
+        getColor: value => colorFromBins(value, [20, 30, 40, 50], pollutantScaleColors),
         legendRows: [
-          { color: pollutantScaleColors[0], label: '0–10', band: 'ppb' },
-          { color: pollutantScaleColors[1], label: '10–20', band: 'ppb' },
-          { color: pollutantScaleColors[2], label: '20–30', band: 'ppb' },
-          { color: pollutantScaleColors[3], label: '30–50', band: 'ppb' },
-          { color: pollutantScaleColors[4], label: '50–80', band: 'ppb' },
-          { color: pollutantScaleColors[5], label: '80+', band: 'ppb' }
+          { color: pollutantScaleColors[0], label: '0–20', band: 'ppb' },
+          { color: pollutantScaleColors[1], label: '20–30', band: 'ppb' },
+          { color: pollutantScaleColors[3], label: '30–40', band: 'ppb' },
+          { color: pollutantScaleColors[4], label: '40–50', band: 'ppb' },
+          { color: pollutantScaleColors[5], label: '50+', band: 'ppb' }
         ],
-        note: 'Example scale'
+        note: ''
       },
 
       no: {
@@ -350,20 +355,19 @@
           { color: pollutantScaleColors[4], label: '40–80', band: 'ppb' },
           { color: pollutantScaleColors[5], label: '80+', band: 'ppb' }
         ],
-        note: 'Example scale'
+        note: ''
       },
 
       co: {
         label: 'CO',
         getValue: latest => getPollutantValue(latest, 'co'),
-        getColor: value => colorFromBins(value, [0.2, 0.4, 0.8, 1.5, 3], pollutantScaleColors),
+        getColor: value => colorFromBins(value, [1, 2, 3, 4], pollutantScaleColors),
         legendRows: [
-          { color: pollutantScaleColors[0], label: '0–0.2', band: 'ppm' },
-          { color: pollutantScaleColors[1], label: '0.2–0.4', band: 'ppm' },
-          { color: pollutantScaleColors[2], label: '0.4–0.8', band: 'ppm' },
-          { color: pollutantScaleColors[3], label: '0.8–1.5', band: 'ppm' },
-          { color: pollutantScaleColors[4], label: '1.5–3', band: 'ppm' },
-          { color: pollutantScaleColors[5], label: '3+', band: 'ppm' }
+          { color: pollutantScaleColors[0], label: '0–1', band: 'ppm' },
+          { color: pollutantScaleColors[1], label: '1–2', band: 'ppm' },
+          { color: pollutantScaleColors[3], label: '2–3', band: 'ppm' },
+          { color: pollutantScaleColors[4], label: '3–4', band: 'ppm' },
+          { color: pollutantScaleColors[5], label: '4+', band: 'ppm' }
         ],
         note: 'Example scale'
       },
@@ -371,16 +375,16 @@
       co2: {
         label: 'CO2',
         getValue: latest => getPollutantValue(latest, 'co2'),
-        getColor: value => colorFromBins(value, [500, 700, 900, 1200, 2000], pollutantScaleColors),
+        getColor: value => colorFromBins(value, [500, 600, 700, 800, 900], pollutantScaleColors),
         legendRows: [
           { color: pollutantScaleColors[0], label: '0–500', band: 'ppm' },
-          { color: pollutantScaleColors[1], label: '500–700', band: 'ppm' },
-          { color: pollutantScaleColors[2], label: '700–900', band: 'ppm' },
-          { color: pollutantScaleColors[3], label: '900–1200', band: 'ppm' },
-          { color: pollutantScaleColors[4], label: '1200–2000', band: 'ppm' },
-          { color: pollutantScaleColors[5], label: '2000+', band: 'ppm' }
+          { color: pollutantScaleColors[1], label: '500–600', band: 'ppm' },
+          { color: pollutantScaleColors[2], label: '600–700', band: 'ppm' },
+          { color: pollutantScaleColors[3], label: '700–800', band: 'ppm' },
+          { color: pollutantScaleColors[4], label: '800–900', band: 'ppm' },
+          { color: pollutantScaleColors[5], label: '900+', band: 'ppm' }
         ],
-        note: 'Example scale'
+        note: ''
       }
     };
 
