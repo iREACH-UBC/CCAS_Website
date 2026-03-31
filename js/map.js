@@ -2,19 +2,17 @@
 
 import { getSensorData } from './data.js';
 
-const map = L.map('map')
-  .addLayer(L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'))
+const map = L.map('map');
 
 // approximate VCH bounds: SW corner at ~49.0° N, –123.6° W; NE at ~50.5° N, –122.0° W
-const vchBounds = [[49.0, -123.6], [50.5, -122.0]]
-map.fitBounds(vchBounds)
-
+const vchBounds = [[49.0, -123.6], [50.5, -122.0]];
+map.fitBounds(vchBounds);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-/* ── 2.  Colour helper for AQHI bands ─────────────────────────────── */
+/* ── 2. Colour helper for AQHI bands ─────────────────────────────── */
 function getAQHIColor(aqhi) {
   if (aqhi <= 1) return '#67c1f1';
   if (aqhi <= 2) return '#4e95c7';
@@ -28,47 +26,90 @@ function getAQHIColor(aqhi) {
   return '#8b2328';
 }
 
-/* ── Legend: fixed AQHI colour scale (1–10+) ───────────────────────── */
-const legend = L.control({ position: 'bottomright' });
+function getPollutantUnit(primary) {
+  switch ((primary || '').toUpperCase()) {
+    case 'PM2.5':
+    case 'PM10':
+    case 'PM1.0':
+      return 'µg/m³';
+    case 'O3':
+    case 'NO2':
+    case 'NO':
+    case 'CO':
+      return 'ppb';
+    case 'CO2':
+      return 'ppm';
+    default:
+      return '';
+  }
+}
 
-legend.onAdd = function () {
+function formatPrimaryPollutant(latest) {
+  const primary = latest.primary ?? '—';
+
+  // Try a few likely field names for concentration
+  const concentration =
+    latest.primary_concentration ??
+    latest.primary_value ??
+    latest.primary_conc ??
+    null;
+
+  if (primary === '—' || concentration == null || Number.isNaN(Number(concentration))) {
+    return `Primary Pollutant: ${primary}`;
+  }
+
+  const unit =
+    latest.primary_unit ??
+    latest.primary_units ??
+    getPollutantUnit(primary);
+
+  return `Primary Pollutant: ${primary} (${Number(concentration).toFixed(1)}${unit ? ' ' + unit : ''})`;
+}
+
+/* ── Legend: fixed AQHI colour scale (1–10+) ─────────────────────── */
+const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+const aqhiLegend = L.control({
+  position: isDesktop ? 'bottomleft' : 'bottomright'
+});
+
+aqhiLegend.onAdd = function () {
   const div = L.DomUtil.create('div', 'aqhi-legend');
-  const grades = [1,2,3,4,5,6,7,8,9,10.5];   // 10.5 → use "10+" colour
-  const labels = ['1','2','3','4','5','6','7','8','9','10+'];
+  const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10.5];
+  const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
 
   const swatches = grades
     .map(g => `<span class="swatch" style="background:${getAQHIColor(g)}"></span>`)
     .join('');
 
-    div.innerHTML = `
-      <h4 class="legend-title">
-        <span>AQHI</span>
-        <a class="legend-help"
-           href="info.html#aqhi"
-           aria-label="What is this colour scale? Learn more on the Info page.">
-           What’s this?
-        </a>
-      </h4>
-      <div class="swatches">${swatches}</div>
-      <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
-      <div class="bands" aria-label="AQHI risk categories">
-        <span class="low">Low (1–3)</span>
-        <span class="moderate">Moderate (4–6)</span>
-        <span class="high">High (7–9)</span>
-        <span class="vhigh">Very High (10+)</span>
-      </div>
+  div.innerHTML = `
+    <h4 class="legend-title">
+      <span>AQHI</span>
+      <a class="legend-help"
+         href="info.html#aqhi"
+         aria-label="What is this colour scale? Learn more on the Info page.">
+         What’s this?
+      </a>
+    </h4>
+    <div class="swatches">${swatches}</div>
+    <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
+    <div class="bands" aria-label="AQHI risk categories">
+      <span class="low">Low (1–3)</span>
+      <span class="moderate">Moderate (4–6)</span>
+      <span class="high">High (7–9)</span>
+      <span class="vhigh">Very High (10+)</span>
+    </div>
   `;
   return div;
 };
 
-legend.addTo(map);
+aqhiLegend.addTo(map);
 
-
-/* ── 3.  Fetch JSON once and add markers ──────────────────────────── */
+/* ── 3. Fetch JSON once and add markers ──────────────────────────── */
 getSensorData().then(({ sensors, generated_at }) => {
   sensors.forEach(sensor => {
     const { lat, lon, latest } = sensor;
-    if (lat == null || lon == null) return;          // skip if no coords
+    if (lat == null || lon == null) return;
 
     const marker = L.circleMarker([lat, lon], {
       color: getAQHIColor(latest.aqhi ?? 0),
@@ -79,12 +120,11 @@ getSensorData().then(({ sensors, generated_at }) => {
     marker.bindPopup(`
       <b>${sensor.name ?? sensor.id}</b><br/>
       AQHI: ${latest.aqhi ?? '—'}<br/>
-      Primary Pollutant: ${latest.primary ?? '—'}<br/>
+      ${formatPrimaryPollutant(latest)}<br/>
       <small>${new Date(generated_at).toLocaleString()}</small>
     `);
   });
 
-  // Optional: show last JSON build time in page title
   document.title += ` – updated ${new Date(generated_at).toLocaleTimeString()}`;
 }).catch(err => {
   console.error(err);
