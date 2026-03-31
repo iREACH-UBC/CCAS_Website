@@ -52,6 +52,80 @@
       }
     }
 
+    /* Resource section */
+    .resource-grid{
+      display:grid;
+      gap:1rem;
+      margin-top:1rem;
+    }
+
+    .resource-card{
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);
+      overflow:hidden;
+    }
+
+    .resource-card > summary{
+      cursor:pointer;
+      padding:.9rem 1rem;
+      font-weight:600;
+      list-style:none;
+    }
+
+    .resource-card > summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .resource-card[open] > summary{
+      border-bottom:1px solid #e5e7eb;
+      background:#f8fafc;
+    }
+
+    .resource-body{
+      padding:1rem;
+    }
+
+    .resource-body p{
+      margin:.5rem 0 0;
+    }
+
+    .resource-links{
+      margin:.75rem 0 0;
+      padding-left:1.1rem;
+    }
+
+    .resource-links li{
+      margin:.25rem 0;
+    }
+
+    .resource-shot{
+      margin-top:.9rem;
+    }
+
+    .resource-shot a{
+      display:block;
+      text-decoration:none;
+    }
+
+    .resource-shot img{
+      width:100%;
+      height:auto;
+      border:1px solid #e5e7eb;
+      border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .resource-caption{
+      margin-top:.35rem;
+      font-size:.9rem;
+      color:#555;
+    }
+
+    .aqhi-img-wrap a{
+      display:block;
+    }
   </style>
 </head>
 
@@ -106,35 +180,45 @@
       <!-- Compact, collapsible appendix content -->
       <details id="what-is-the-scale-for-the-aqhi">
         <summary><strong>How to read the AQHI+ scale</strong></summary>
-        <p>The Air Quality Health Index (AQHI) scale is designed to help you identify the level of risk health associated with outdoor air quality. The AQHI+ scale is an updated index that is designed to capture sudden or temporary spikes in pollution from wildfire smoke. Both the AQHI and AQHI+ scales range from 1–10+, grouped into health-risk categories:</p>
+        <p>
+          The Air Quality Health Index (AQHI) scale is designed to help you identify the level of health risk associated with outdoor air quality.
+          The AQHI+ scale is an updated index that is designed to capture sudden or temporary spikes in pollution from wildfire smoke.
+          Both the AQHI and AQHI+ scales range from 1–10+, grouped into health-risk categories:
+        </p>
         <ul>
           <li><strong>1–3:</strong> Low health risk</li>
           <li><strong>4–6:</strong> Moderate health risk</li>
           <li><strong>7–9:</strong> High health risk</li>
           <li><strong>10+:</strong> Very high health risk</li>
         </ul>
-        <p>Vancouver Coastal Health recommends avoiding strenuous outdoor activities (like running) during period of poor air quality, and provides specific guidance for periods of wildfire smoke: 
-        <a href="https://www.vch.ca/en/wildfire-smoke" target="_blank" rel="noopener noreferrer">
-          Wildfire smoke guidance — VCH
-          <span class="visually-hidden">(opens in a new tab)</span>
-        </a>
-
+        <p>
+          Vancouver Coastal Health recommends avoiding strenuous outdoor activities (like running) during periods of poor air quality,
+          and provides specific guidance for periods of wildfire smoke:
+          <a href="https://www.vch.ca/en/wildfire-smoke" target="_blank" rel="noopener noreferrer">
+            Wildfire smoke guidance — VCH
+            <span class="visually-hidden">(opens in a new tab)</span>
+          </a>
         </p>
+
         <div class="aqhi-img-wrap">
-          <img
-            class="aqhi-img"
-            src="assets/aqhi-table/heat-index-table.png"
-            alt="AQHI scale with PM2.5 ranges, provincial AQHI values, risk categories, health guidance, and smoke-exposure actions."
-            width="900" height="840"
-            decoding="async"
-          >
+          <a href="assets/aqhi-table/heat-index-table.png" target="_blank" rel="noopener noreferrer">
+            <img
+              class="aqhi-img"
+              src="assets/aqhi-table/heat-index-table.png"
+              alt="AQHI scale with PM2.5 ranges, provincial AQHI values, risk categories, health guidance, and smoke-exposure actions."
+              width="900" height="840"
+              decoding="async"
+            >
+          </a>
         </div>
-      
       </details>
 
       <details id="how-is-the-aqhi-calculated">
         <summary><strong>How is the AQHI calculated?</strong></summary>
-        <p>The AQHI is calculated based on the relative risks of a combination of common air pollutants that is known to harm human health. In British Columbia, two calculations are done and the higher value is reported:</p>
+        <p>
+          The AQHI is calculated based on the relative risks of a combination of common air pollutants that is known to harm human health.
+          In British Columbia, two calculations are done and the higher value is reported:
+        </p>
         <ol>
           <li>
             A calculation using three pollutants:
@@ -146,8 +230,138 @@
           </li>
           <li>Fine Particulate Matter (PM<sub>2.5</sub>) concentration alone.</li>
         </ol>
-        <p>This means that in periods of high PM<sub>2.5</sub> concentrations, the AQHI+ depends exclusively on PM<sub>2.5</sub> concentrations. </p>
+        <p>
+          This means that in periods of high PM<sub>2.5</sub> concentrations, the AQHI+ depends exclusively on PM<sub>2.5</sub> concentrations.
+        </p>
       </details>
+    </section>
+
+    <section id="resources" aria-labelledby="resources-title">
+      <h2 id="resources-title">Other Air Quality Resources</h2>
+      <p>
+        The resources below can complement this dashboard by providing additional air-quality, smoke, and weather information.
+      </p>
+
+      <div class="resource-grid">
+        <details class="resource-card" id="resource-aq-map">
+          <summary>AQ Map</summary>
+          <div class="resource-body">
+            <p>
+              <a href="https://aqmap.ca/" target="_blank" rel="noopener noreferrer">Open AQ Map</a>
+            </p>
+            <p>
+              AQ Map is a useful source for PM<sub>2.5</sub> data in BC and across Canada. Clicking a monitor shows AQHI and PM<sub>2.5</sub>
+              concentrations over multiple averaging periods, and also allows time-series plotting. It includes federal reference monitors
+              and lower-cost sensors such as PurpleAir. Note that this project’s outdoor monitors will not appear on this map.
+            </p>
+
+            <div class="resource-shot">
+              <a href="https://aqmap.ca/" target="_blank" rel="noopener noreferrer">
+                <img src="assets/resources/aq-map.png" alt="Screenshot of AQ Map.">
+              </a>
+              <div class="resource-caption">Clicking the image opens AQ Map.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-card" id="resource-bc-air-quality">
+          <summary>BC Air Quality Map</summary>
+          <div class="resource-body">
+            <p>
+              <a href="https://www.env.gov.bc.ca/epd/bcairquality/readings/find-stations-map.html" target="_blank" rel="noopener noreferrer">Open BC Air Quality map</a><br>
+              <a href="https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=afaa6732c39743dd93f4d5673553d5bd" target="_blank" rel="noopener noreferrer">Open mobile-friendly version</a>
+            </p>
+            <p>
+              This map shows AQHI, PM<sub>2.5</sub>, and other criteria pollutant concentrations measured at stations throughout British Columbia.
+              Tabs above the map allow users to switch between pollutant views.
+            </p>
+
+            <div class="resource-shot">
+              <a href="https://www.env.gov.bc.ca/epd/bcairquality/readings/find-stations-map.html" target="_blank" rel="noopener noreferrer">
+                <img src="assets/resources/bc-air-quality-map.png" alt="Screenshot of the BC Air Quality monitoring map.">
+              </a>
+              <div class="resource-caption">Clicking the image opens the BC Air Quality map.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-card" id="resource-airmap">
+          <summary>Metro Vancouver AirMap</summary>
+          <div class="resource-body">
+            <p>
+              <a href="https://gis.metrovancouver.org/maps/Air" target="_blank" rel="noopener noreferrer">Open Metro Vancouver AirMap</a>
+            </p>
+            <p>
+              AirMap is especially helpful for Metro Vancouver residents. It includes AQHI by region, AQHI forecasts, monitoring station data,
+              pollutant-specific map layers, time series where available, and current residential indoor wood-burning status.
+            </p>
+
+            <div class="resource-shot">
+              <a href="https://gis.metrovancouver.org/maps/Air" target="_blank" rel="noopener noreferrer">
+                <img src="assets/resources/metrovancouver-airmap.png" alt="Screenshot of Metro Vancouver AirMap.">
+              </a>
+              <div class="resource-caption">Clicking the image opens Metro Vancouver AirMap.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-card" id="resource-firesmoke">
+          <summary>FireSmoke Canada</summary>
+          <div class="resource-body">
+            <p>
+              <a href="https://firesmoke.ca/" target="_blank" rel="noopener noreferrer">Open FireSmoke Canada</a>
+            </p>
+            <p>
+              FireSmoke Canada is a helpful resource for wildfire-smoke forecasts and projected PM<sub>2.5</sub> concentrations from active wildfires.
+              It also provides access to fire weather forecasts and other wildfire-related resources.
+            </p>
+
+            <div class="resource-shot">
+              <a href="https://firesmoke.ca/" target="_blank" rel="noopener noreferrer">
+                <img src="assets/resources/firesmoke-canada.png" alt="Screenshot of FireSmoke Canada.">
+              </a>
+              <div class="resource-caption">Clicking the image opens FireSmoke Canada.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-card" id="resource-windy">
+          <summary>Windy.com</summary>
+          <div class="resource-body">
+            <p>
+              <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">Open Windy.com</a>
+            </p>
+            <p>
+              Windy.com is a useful place to view wind and weather forecasts alongside the other air-quality resources listed here.
+            </p>
+
+            <div class="resource-shot">
+              <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">
+                <img src="assets/resources/windy.png" alt="Screenshot of Windy.com.">
+              </a>
+              <div class="resource-caption">Clicking the image opens Windy.com.</div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-card" id="resource-alerts">
+          <summary>Sign up for air-quality alerts</summary>
+          <div class="resource-body">
+            <ul class="resource-links">
+              <li>
+                <a href="https://metrovancouver.org/services/air-quality-climate-action/air-quality-data-and-advisories" target="_blank" rel="noopener noreferrer">
+                  Metro Vancouver air-quality advisories
+                </a>
+              </li>
+              <li>
+                <a href="https://www2.gov.bc.ca/gov/content/environment/air-land-water/air/air-quality/air-advisories" target="_blank" rel="noopener noreferrer">
+                  British Columbia air advisories
+                </a>
+              </li>
+            </ul>
+          </div>
+        </details>
+      </div>
     </section>
 
     <h2>Contact &amp; Feedback</h2>
