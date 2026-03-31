@@ -1,10 +1,9 @@
-/* js/map.js  – ES-module */
+/* js/map.js – ES-module */
 
 import { getSensorData } from './data.js';
 
 const map = L.map('map');
 
-// approximate VCH bounds: SW corner at ~49.0° N, –123.6° W; NE at ~50.5° N, –122.0° W
 const vchBounds = [[49.0, -123.6], [50.5, -122.0]];
 map.fitBounds(vchBounds);
 
@@ -12,7 +11,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-/* ── 2. Colour helper for AQHI bands ─────────────────────────────── */
+/* ── AQHI colour helper ──────────────────────────────────────────── */
 function getAQHIColor(aqhi) {
   if (aqhi <= 1) return '#67c1f1';
   if (aqhi <= 2) return '#4e95c7';
@@ -26,8 +25,34 @@ function getAQHIColor(aqhi) {
   return '#8b2328';
 }
 
+/* ── Primary pollutant helpers ───────────────────────────────────── */
+function normalizeSubscripts(str) {
+  const subscriptMap = {
+    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'
+  };
+
+  return String(str ?? '').replace(/[₀₁₂₃₄₅₆₇₈₉]/g, ch => subscriptMap[ch] || ch);
+}
+
+function canonicalPollutant(primary) {
+  const raw = normalizeSubscripts(primary).toUpperCase().replace(/\s+/g, '');
+
+  if (!raw) return null;
+  if (raw.includes('PM2.5') || raw.includes('PM25') || raw.includes('PM2_5')) return 'PM2.5';
+  if (raw.includes('PM10')) return 'PM10';
+  if (raw.includes('PM1.0') || raw.includes('PM1_0') || raw === 'PM1') return 'PM1.0';
+  if (raw === 'O3' || raw.includes('OZONE')) return 'O3';
+  if (raw === 'NO2' || raw.includes('NITROGENDIOXIDE')) return 'NO2';
+  if (raw === 'NO') return 'NO';
+  if (raw === 'CO2') return 'CO2';
+  if (raw === 'CO' || raw.includes('CARBONMONOXIDE')) return 'CO';
+
+  return normalizeSubscripts(primary);
+}
+
 function getPollutantUnit(primary) {
-  switch ((primary || '').toUpperCase()) {
+  switch (canonicalPollutant(primary)) {
     case 'PM2.5':
     case 'PM10':
     case 'PM1.0':
@@ -45,15 +70,28 @@ function getPollutantUnit(primary) {
 }
 
 function getPrimaryConcentration(latest, primary) {
-  if (!primary) return null;
+  const canon = canonicalPollutant(primary);
+  if (!canon) return null;
 
-  switch (primary.toUpperCase()) {
+  const generic =
+    latest.primary_concentration ??
+    latest.primary_value ??
+    latest.primary_conc ??
+    latest.primaryConc ??
+    latest.primaryValue ??
+    null;
+
+  if (generic != null && !Number.isNaN(Number(generic))) {
+    return generic;
+  }
+
+  switch (canon) {
     case 'PM2.5':
-      return latest.pm25 ?? latest.pm2_5 ?? latest['PM2.5'] ?? latest['PM2_5'] ?? null;
+      return latest.pm25 ?? latest.pm2_5 ?? latest.pm2p5 ?? latest['PM2.5'] ?? latest['PM2_5'] ?? latest['PM25'] ?? null;
     case 'PM10':
       return latest.pm10 ?? latest['PM10'] ?? null;
     case 'PM1.0':
-      return latest.pm1 ?? latest.pm1_0 ?? latest['PM1.0'] ?? latest['PM1_0'] ?? null;
+      return latest.pm1 ?? latest.pm1_0 ?? latest.pm1p0 ?? latest['PM1.0'] ?? latest['PM1_0'] ?? null;
     case 'O3':
       return latest.o3 ?? latest['O3'] ?? null;
     case 'NO2':
@@ -70,10 +108,17 @@ function getPrimaryConcentration(latest, primary) {
 }
 
 function formatPrimaryPollutant(latest) {
-  const primary = latest.primary ?? latest.primary_pollutant ?? null;
-  if (!primary) return 'Primary Pollutant: —';
+  const rawPrimary =
+    latest.primary ??
+    latest.primary_pollutant ??
+    latest.primaryPollutant ??
+    null;
 
-  const concentration = getPrimaryConcentration(latest, primary);
+  if (!rawPrimary) return 'Primary Pollutant: —';
+
+  const primary = canonicalPollutant(rawPrimary);
+  const concentration = getPrimaryConcentration(latest, rawPrimary);
+
   if (concentration == null || Number.isNaN(Number(concentration))) {
     return `Primary Pollutant: ${primary}`;
   }
@@ -82,11 +127,11 @@ function formatPrimaryPollutant(latest) {
   return `Primary Pollutant: ${primary} (${Number(concentration).toFixed(1)} ${unit})`;
 }
 
-/* ── Legend: fixed AQHI colour scale (1–10+) ─────────────────────── */
+/* ── Legend ──────────────────────────────────────────────────────── */
 const isDesktop = window.matchMedia('(min-width: 768px)').matches;
 
 const aqhiLegend = L.control({
-  position: isDesktop ? 'topleft' : 'bottomright'
+  position: isDesktop ? 'topleft' : 'topright'
 });
 
 aqhiLegend.onAdd = function () {
@@ -117,7 +162,7 @@ aqhiLegend.onAdd = function () {
 
   div.innerHTML = `
     <h4 class="legend-title">
-      <span>AQHI</span>
+      <span class="legend-heading">AQHI</span>
       <a class="legend-help"
          href="info.html#aqhi"
          aria-label="What is this colour scale? Learn more on the Info page.">
@@ -134,13 +179,13 @@ aqhiLegend.onAdd = function () {
 
 aqhiLegend.addTo(map);
 
-/* ── 3. Fetch JSON once and add markers ──────────────────────────── */
+/* ── Fetch JSON and add markers ──────────────────────────────────── */
 getSensorData().then(({ sensors, generated_at }) => {
   sensors.forEach(sensor => {
     const { lat, lon, latest } = sensor;
     if (lat == null || lon == null) return;
 
-    console.log(sensor.name ?? sensor.id, latest);
+    console.log('PRIMARY DEBUG', sensor.name ?? sensor.id, latest.primary, latest);
 
     const marker = L.circleMarker([lat, lon], {
       color: getAQHIColor(latest.aqhi ?? 0),
