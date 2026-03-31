@@ -35,8 +35,8 @@ function getPollutantUnit(primary) {
     case 'O3':
     case 'NO2':
     case 'NO':
-    case 'CO':
       return 'ppb';
+    case 'CO':
     case 'CO2':
       return 'ppm';
     default:
@@ -44,43 +44,76 @@ function getPollutantUnit(primary) {
   }
 }
 
+function getPrimaryConcentration(latest, primary) {
+  if (!primary) return null;
+
+  switch (primary.toUpperCase()) {
+    case 'PM2.5':
+      return latest.pm25 ?? latest.pm2_5 ?? latest['PM2.5'] ?? latest['PM2_5'] ?? null;
+    case 'PM10':
+      return latest.pm10 ?? latest['PM10'] ?? null;
+    case 'PM1.0':
+      return latest.pm1 ?? latest.pm1_0 ?? latest['PM1.0'] ?? latest['PM1_0'] ?? null;
+    case 'O3':
+      return latest.o3 ?? latest['O3'] ?? null;
+    case 'NO2':
+      return latest.no2 ?? latest['NO2'] ?? null;
+    case 'NO':
+      return latest.no ?? latest['NO'] ?? null;
+    case 'CO':
+      return latest.co ?? latest['CO'] ?? null;
+    case 'CO2':
+      return latest.co2 ?? latest['CO2'] ?? null;
+    default:
+      return null;
+  }
+}
+
 function formatPrimaryPollutant(latest) {
-  const primary = latest.primary ?? '—';
+  const primary = latest.primary ?? latest.primary_pollutant ?? null;
+  if (!primary) return 'Primary Pollutant: —';
 
-  // Try a few likely field names for concentration
-  const concentration =
-    latest.primary_concentration ??
-    latest.primary_value ??
-    latest.primary_conc ??
-    null;
-
-  if (primary === '—' || concentration == null || Number.isNaN(Number(concentration))) {
+  const concentration = getPrimaryConcentration(latest, primary);
+  if (concentration == null || Number.isNaN(Number(concentration))) {
     return `Primary Pollutant: ${primary}`;
   }
 
-  const unit =
-    latest.primary_unit ??
-    latest.primary_units ??
-    getPollutantUnit(primary);
-
-  return `Primary Pollutant: ${primary} (${Number(concentration).toFixed(1)}${unit ? ' ' + unit : ''})`;
+  const unit = getPollutantUnit(primary);
+  return `Primary Pollutant: ${primary} (${Number(concentration).toFixed(1)} ${unit})`;
 }
 
 /* ── Legend: fixed AQHI colour scale (1–10+) ─────────────────────── */
 const isDesktop = window.matchMedia('(min-width: 768px)').matches;
 
 const aqhiLegend = L.control({
-  position: isDesktop ? 'bottomleft' : 'bottomright'
+  position: isDesktop ? 'topleft' : 'bottomright'
 });
 
 aqhiLegend.onAdd = function () {
   const div = L.DomUtil.create('div', 'aqhi-legend');
+
   const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10.5];
   const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
+  const bands = [
+    'Low',
+    'Low',
+    'Low',
+    'Moderate',
+    'Moderate',
+    'Moderate',
+    'High',
+    'High',
+    'High',
+    'Very High'
+  ];
 
-  const swatches = grades
-    .map(g => `<span class="swatch" style="background:${getAQHIColor(g)}"></span>`)
-    .join('');
+  const rows = grades.map((g, i) => `
+    <div class="legend-row">
+      <span class="swatch" style="background:${getAQHIColor(g)}"></span>
+      <span class="legend-value">${labels[i]}</span>
+      <span class="legend-band">${bands[i]}</span>
+    </div>
+  `).join('');
 
   div.innerHTML = `
     <h4 class="legend-title">
@@ -91,15 +124,11 @@ aqhiLegend.onAdd = function () {
          What’s this?
       </a>
     </h4>
-    <div class="swatches">${swatches}</div>
-    <div class="ticks">${labels.map(l => `<span>${l}</span>`).join('')}</div>
-    <div class="bands" aria-label="AQHI risk categories">
-      <span class="low">Low (1–3)</span>
-      <span class="moderate">Moderate (4–6)</span>
-      <span class="high">High (7–9)</span>
-      <span class="vhigh">Very High (10+)</span>
+    <div class="legend-list" aria-label="AQHI risk categories">
+      ${rows}
     </div>
   `;
+
   return div;
 };
 
@@ -110,6 +139,8 @@ getSensorData().then(({ sensors, generated_at }) => {
   sensors.forEach(sensor => {
     const { lat, lon, latest } = sensor;
     if (lat == null || lon == null) return;
+
+    console.log(sensor.name ?? sensor.id, latest);
 
     const marker = L.circleMarker([lat, lon], {
       color: getAQHIColor(latest.aqhi ?? 0),
