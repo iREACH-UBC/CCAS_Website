@@ -1,6 +1,6 @@
 // js/data.js
 const JSON_URL =
-  "https://raw.githubusercontent.com/iREACH-UBC/CCAS_Dashboard/main/pollutant_data.json";
+  "https://raw.githubusercontent.com/iREACH-UBC/dashboard_local/refs/heads/main/pollutant_data.json";
 
 const DEFAULT_MAX_AGE_MS = 60_000 *15; // Refresh once every 15 minutes
 
