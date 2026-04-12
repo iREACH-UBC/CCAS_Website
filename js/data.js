@@ -2,7 +2,7 @@
 const JSON_URL =
   "https://raw.githubusercontent.com/iREACH-UBC/dashboard_local/refs/heads/main/pollutant_data.json";
 
-const DEFAULT_MAX_AGE_MS = 60_000 *15; // Refresh once every 15 minutes
+const DEFAULT_MAX_AGE_MS = 60_000 *10; // Refresh once every 15 minutes
 
 let _cache = null;
 let _cacheTimeMs = 0;
@@ -25,8 +25,6 @@ export async function getSensorData({ force = false, maxAgeMs = DEFAULT_MAX_AGE_
     return _cache;
   }
 
-  // "no-cache" means revalidate before reuse (often preferable for JSON)
-  // vs "no-store" which avoids storing entirely. :contentReference[oaicite:1]{index=1}
   const res = await fetch(JSON_URL, { cache: "no-cache" });
   if (!res.ok) throw new Error(`Failed to fetch JSON: ${res.status}`);
 
