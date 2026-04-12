@@ -2,7 +2,7 @@
 const JSON_URL =
   "https://raw.githubusercontent.com/iREACH-UBC/dashboard_local/refs/heads/main/pollutant_data.json";
 
-const DEFAULT_MAX_AGE_MS = 60_000 *10; // Refresh once every 15 minutes
+const DEFAULT_MAX_AGE_MS = 60_000 *1; // Refresh once every 15 minutes
 
 let _cache = null;
 let _cacheTimeMs = 0;
