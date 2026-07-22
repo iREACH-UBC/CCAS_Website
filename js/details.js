@@ -120,25 +120,45 @@ function updateStaleWarning(lastSampleDate, sensor) {
 
 /* ---------- Initialise --------------------------------------------------- */
 
-init();
-async function init () {
-  const { sensors }   = await getSensorData();
-  sensors.forEach(s => sensorSel.add(new Option(s.name || s.id, s.id)));
+/* ---------- Initialise --------------------------------------------------- */
 
-  const state         = loadState(sensors);
-  sensorSel.value     = state.sensor;
-  pollutantSel.value  = state.pollutant;
+init();
+
+async function init () {
+  const { sensors } = await getSensorData();
+
+  // Sort by the displayed sensor name rather than sensor ID
+  const sortedSensors = [...sensors].sort((a, b) => {
+    const nameA = a.name || a.id;
+    const nameB = b.name || b.id;
+
+    return nameA.localeCompare(nameB, undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    });
+  });
+
+  sortedSensors.forEach(sensor => {
+    sensorSel.add(
+      new Option(sensor.name || sensor.id, sensor.id)
+    );
+  });
+
+  const state        = loadState(sortedSensors);
+  sensorSel.value    = state.sensor;
+  pollutantSel.value = state.pollutant;
 
   sensorSel.addEventListener('change', () => {
     saveState(sensorSel.value, pollutantSel.value);
     drawChart();
   });
+
   pollutantSel.addEventListener('change', () => {
     saveState(sensorSel.value, pollutantSel.value);
     drawChart();
   });
 
-  await drawChart();                    // first render
+  await drawChart();
 }
 
 /* ---------- Chart-drawing ------------------------------------------------ */
